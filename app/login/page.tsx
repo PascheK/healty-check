@@ -9,6 +9,13 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
+    const savedCode = localStorage.getItem('userCode');
+    if (savedCode) {
+      router.push('/profile'); // 👈 Redirige automatiquement si déjà connecté
+    }
+  }, []);
+
+  useEffect(() => {
     fetch('/api/users', {
       headers: {
         Authorization: 'Bearer X9tPz8*Kw3%Vd4!Ln7@', // doit correspondre à .env.local
