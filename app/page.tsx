@@ -14,7 +14,14 @@ const quotes = [
 export default function HomePage() {
   const [quote, setQuote] = useState('');
   const router = useRouter();
-
+  // 🔔 Demander la permission de notifications
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      if (Notification.permission !== 'granted') {
+        Notification.requestPermission();
+      }
+    }
+  }, []);
   useEffect(() => {
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
     setQuote(randomQuote);

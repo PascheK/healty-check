@@ -59,6 +59,17 @@ export function useBonBienEtre(userCode: string | null, secret: string, interval
     localStorage.setItem(bonKey, nouveau.texte);
     localStorage.setItem(timeKey, Date.now().toString());
     localStorage.setItem(usedKey, 'false');
+
+
+      // ➕ Notification native
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('🎁 Nouveau bon bien-être disponible !', {
+          body: `"${nouveau.texte}" est maintenant disponible`,
+          icon: '/public/icon-192x192.png',
+        });
+      }
+  
+    
   };
 
   const utiliserBon = () => {

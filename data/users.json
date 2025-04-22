@@ -1,39 +1,51 @@
 [
   {
-    "code": "alice123",
-    "prenom": "Alice",
-    "nom": "Dupont",
+    "code": "emmadoug1",
+    "prenom": "Emma",
+    "nom": "❤️",
     "categories": [
       {
-        "nom": "Tête 🧠",
+        "nom": "Santé 🩺",
         "objectifs": [
-          "Écrire ce que je ressens",
-          "Respirer profondément",
-          "Écouter une musique apaisante"
+          "Boire un grand verre d’eau",
+          "Manger quelque chose de nourrissant",
+          "Se lever et s'étirer doucement",
+          "Prendre une douche rapide",
+          "Se brosser les dents",
+          "Faire quelques pas, même à l’intérieur",
+          "Ouvrir une fenêtre ou sortir 5 min pour respirer",
+          "Se reposer sans culpabiliser"
         ]
       },
       {
-        "nom": "Pieds 🧠",
+        "nom": "Mentale 🧠",
         "objectifs": [
-          "Écrire ce que je d",
-          "Respirer f",
-          "Écouter une f apaisante"
+          "Respirer profondément 5 fois en fermant les yeux",
+          "Dire une phrase bienveillante sur moi-même",
+          "Écrire ce que je ressens dans un carnet",
+          "Regarder une vidéo douce ou inspirante",
+          "Écouter une musique qui me fait du bien",
+          "Me rappeler que ce que je ressens est légitime",
+          "Visualiser un moment ou un lieu qui m’apaise",
+          "Couper les réseaux pendant 30 min",
+          "Parler à quelqu’un de confiance"
         ]
-      }
-    ]
-  },
-  {
-    "code": "bob456",
-    "prenom": "Bob",
-    "nom": "Martin",
-    "categories": [
+      },
       {
-        "nom": "Corps 🧍‍♀️",
+        "nom": "Autre 🌟",
         "objectifs": [
-          "Faire une pause sans écran",
-          "Aller courir 15 minutes"
+          "Ranger une toute petite zone (bureau, coin lit...)",
+          "Allumer une lumière douce ou une bougie",
+          "S’envelopper dans une couverture douillette",
+          "Faire une activité calme (dessin, tricot, coloriage...)",
+          "Choisir une tâche simple que je peux faire maintenant",
+          "Regarder une photo ou un souvenir qui me fait sourire",
+          "Créer une playlist “doudou”",
+          "Mettre un timer de 5 min pour “juste commencer” quelque chose",
+          "Ne rien faire. Et l'accepter."
         ]
       }
     ]
   }
+  
 ]

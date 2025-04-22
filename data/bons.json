@@ -1,22 +1,19 @@
 [
-  {
-    "id": 1,
-    "texte": "Fais-toi une boisson chaude et pose-toi ☕"
-  },
-  {
-    "id": 2,
-    "texte": "Prends 10 minutes pour toi, sans écran 🌿"
-  },
-  {
-    "id": 3,
-    "texte": "Écris 3 choses positives sur ta journée 📓"
-  },
-  {
-    "id": 4,
-    "texte": "Sors prendre l’air 5 minutes 🌤️"
-  },
-  {
-    "id": 5,
-    "texte": "Envoie un message gentil à quelqu’un 💌"
-  }
+  { "id": 101, "texte": "Offre-toi un moment câlin avec quelqu’un en qui tu as confiance 🤗" },
+  { "id": 102, "texte": "Propose un petit café ou thé avec une ami-e ☕" },
+  { "id": 103, "texte": "Invite quelqu’un à faire une promenade ensemble 🌿" },
+  { "id": 104, "texte": "Envoie un message doux à une personne que tu aimes 💬" },
+  { "id": 105, "texte": "Organise une mini soirée film/couette avec un proche 📺" },
+  { "id": 106, "texte": "Appelle quelqu’un juste pour discuter sans pression 📞" },
+  { "id": 107, "texte": "Accompagne un proche pour faire une course ou une balade 🛒" },
+  { "id": 108, "texte": "Va manger un bout au resto ou à l’extérieur avec un.e ami.e 🍝" },
+  { "id": 109, "texte": "Écris une lettre (ou message) à quelqu’un que tu n’as pas vu depuis longtemps ✉️" },
+  { "id": 110, "texte": "Accepte une invitation, même juste pour un moment 🍷" },
+  { "id": 111, "texte": "Demande un câlin à quelqu’un que tu aimes 🧡" },
+  { "id": 112, "texte": "Participe à un événement local ou à une activité de groupe 🎨" },
+  { "id": 113, "texte": "Va rendre visite à quelqu’un qui compte pour toi 🏡" },
+  { "id": 114, "texte": "Propose à quelqu’un de venir chez toi pour une activité simple 🎲" },
+  { "id": 115, "texte": "Partage une playlist avec quelqu’un, ou découvre la sienne 🎧" },
+  { "id": 116, "texte": "Vole un nouveau pull avec du parfum comme doudou 🫀" }
+
 ]
