@@ -1,0 +1,39 @@
+[
+  {
+    "code": "alice123",
+    "prenom": "Alice",
+    "nom": "Dupont",
+    "categories": [
+      {
+        "nom": "Tête 🧠",
+        "objectifs": [
+          "Écrire ce que je ressens",
+          "Respirer profondément",
+          "Écouter une musique apaisante"
+        ]
+      },
+      {
+        "nom": "Pieds 🧠",
+        "objectifs": [
+          "Écrire ce que je d",
+          "Respirer f",
+          "Écouter une f apaisante"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "bob456",
+    "prenom": "Bob",
+    "nom": "Martin",
+    "categories": [
+      {
+        "nom": "Corps 🧍‍♀️",
+        "objectifs": [
+          "Faire une pause sans écran",
+          "Aller courir 15 minutes"
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "name": "Healty Check",
+  "short_name": "HealtyCheck",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#3b82f6",
+  "description": "Une to-do bienveillante et des bons cadeaux pour aller mieux",
+  "icons": [
+    {
+      "src": "/public/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/public/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
