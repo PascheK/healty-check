@@ -1,6 +1,6 @@
 import './globals.css';
 import { ReactNode } from 'react';
-import OneSignalInitializer from '@/components/OneSignalInitializer';
+import PushInitializer from '@/components/PushInitializer';
 
 export const metadata = {
   title: 'Healty Check',
@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="Healty Check" />
       </head>
-      <OneSignalInitializer />
+      <PushInitializer />
 
       <body className="bg-gray-900 text-gray-100">{children}</body>
     </html>
