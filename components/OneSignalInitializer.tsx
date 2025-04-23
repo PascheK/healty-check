@@ -1,14 +1,16 @@
 'use client';
 
 import { useEffect } from 'react';
+
 declare global {
   interface Window {
     OneSignal: any;
   }
 }
+
 export default function OneSignalInitializer() {
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'OneSignal' in window) return;
+    if (typeof window === 'undefined') return;
 
     const script = document.createElement('script');
     script.src = 'https://cdn.onesignal.com/sdks/OneSignalSDK.js';
@@ -16,18 +18,19 @@ export default function OneSignalInitializer() {
     document.head.appendChild(script);
 
     script.onload = () => {
-      // @ts-ignore
       window.OneSignal = window.OneSignal || [];
-      // @ts-ignore
-      OneSignal.push(function () {
-              // @ts-ignore
-        OneSignal.init({
-          appId: '5930bdec-10ac-416c-ae20-727911370b75', // 🔁 Remplace ici
-          safari_web_id: '', // Laisse vide si pas utilisé
-          notifyButton: {
-            enable: true,
-          },
-        });
+      window.OneSignal.push(async function () {
+        try {
+          await window.OneSignal.init({
+            appId: '5930bdec-10ac-416c-ae20-727911370b75',
+            notifyButton: {
+              enable: true,
+            },
+          });
+          console.log('✅ OneSignal initialized');
+        } catch (error) {
+          console.error('❌ Erreur OneSignal init :', error);
+        }
       });
     };
   }, []);
