@@ -57,7 +57,7 @@ export default function OptionsMenu({ show, onClose }: Props) {
           icon: '/public/icon-192x192.png'
         });
       }
-    }, 1000 * 10); // toutes les 30 minutes
+    }, 1000 * 10 * 150); // toutes les 30 minutes
     setIntervalId(id);
   };
 
