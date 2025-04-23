@@ -8,9 +8,6 @@ const withPWA = require('next-pwa')({
   register: true,
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
-  fallback: {
-    document: '/offline.html',
-  },
 });
 
 module.exports = withPWA({
