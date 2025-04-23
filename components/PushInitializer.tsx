@@ -6,8 +6,20 @@ console.log('✅ PushInitializer chargé');
 export default function PushInitializer() {
   useEffect(() => {
     const register = async () => {
-      if (typeof window === 'undefined') return;
-      if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+      if (typeof window === 'undefined') {
+        console.log('🚫 Pas de window');
+        return;
+      }
+
+      if (!('serviceWorker' in navigator)) {
+        console.log('🚫 Pas de support service worker');
+        return;
+      }
+
+      if (!('PushManager' in window)) {
+        console.log('🚫 Pas de PushManager dans ce navigateur');
+        return;
+      }
 
       try {
         // 1. Enregistrer le service worker
