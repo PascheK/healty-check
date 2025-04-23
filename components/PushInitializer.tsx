@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+console.log('✅ PushInitializer chargé');
 
 export default function PushInitializer() {
   useEffect(() => {
