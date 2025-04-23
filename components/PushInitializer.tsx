@@ -16,17 +16,20 @@ export default function PushInitializer() {
         console.log('✅ Service Worker enregistré');
 
         // 2. Vérifier permission
+        console.log('✅ SW supporté');
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') {
           console.warn('❌ Permission refusée');
           return;
         }
+        console.log('🔔 Permission notif:', permission);
 
         // 3. S'abonner au PushManager
         const subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array('BIjnRzxdR46f0Eiwa9rjp7HbVZChQY3ibwuW_znzMCqiaUTt1DI5UattFvFFGlKeOH1Owo042r0CfJwFX96qEWM'),
         });
+        console.log('📩 Subscription créée', subscription);
 
         // 4. Envoyer l’abonnement au backend
         await fetch('http://84.227.234.181:4000/api/subscribe', {
