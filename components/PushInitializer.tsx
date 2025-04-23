@@ -10,7 +10,8 @@ export default function PushInitializer() {
 
       try {
         // 1. Enregistrer le service worker
-        const registration = await navigator.serviceWorker.register('/sw.js');
+        await navigator.serviceWorker.register('/sw.js');
+        const registration = await navigator.serviceWorker.ready;
         console.log('✅ Service Worker enregistré');
 
         // 2. Vérifier permission
