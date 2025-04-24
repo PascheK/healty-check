@@ -44,7 +44,7 @@ export default function PushInitializer() {
         console.log('📩 Subscription créée', subscription);
 
         // 4. Envoyer l’abonnement au backend
-        await fetch('http://84.227.234.181:4000/api/subscribe', {
+        await fetch('https://apihealthy.paschek.ch/api/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(subscription),
