@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { authService } from '@/services/authService';
-import { notificationService } from '@/services/notificationService'; // ton service de notification
 
 export default function AnonymousInit() {
   useEffect(() => {

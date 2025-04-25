@@ -77,19 +77,27 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
-self.addEventListener('push', function (event) {
-  const data = event.data?.json() || {};
+self.addEventListener('push', function(event) {
+  console.log('📩 Push reçu:', event);
 
-  const title = data.title || 'Nouvelle notification';
-  const options = {
-    body: data.body || 'Vous avez une nouvelle notification 🎯',
-    icon: '/favicon-192x192.png', // ajoute une icône si tu veux
-    badge: '/favicon-192x192.png', // ajoute une icône de notification si tu veux
-  };
+  if (event.data) {
+    const data = event.data.json();
 
-  event.waitUntil(
-    self.registration.showNotification(title, options)
-  );
+    const options = {
+      body: data.body,
+      icon: '/favicon.png', // IMPORTANT sur iOS !
+      badge: '/favicon.png', // Optionnel mais conseillé
+      data: {
+        url: '/' // Redirection quand l'utilisateur clique
+      }
+    };
+
+    event.waitUntil(
+      self.registration.showNotification(data.title, options)
+    );
+  } else {
+    console.warn('❌ Push reçu sans data');
+  }
 });
 
 self.addEventListener('notificationclick', function (event) {
