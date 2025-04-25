@@ -30,3 +30,30 @@ body {
     opacity: 1;
   }
 }
+@layer utilities {
+  .animate-fade-in {
+    @apply animate-[fadeIn_0.3s_ease-in-out];
+  }
+   
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .animate-fade-zoom-in {
+    animation: fadeZoomIn 0.3s ease-out;
+  }
+  .animate-fade-zoom-out {
+    animation: fadeZoomOut 0.2s ease-in;
+  }
+
+  @keyframes fadeZoomIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes fadeZoomOut {
+    from { opacity: 1; transform: scale(1); }
+    to   { opacity: 0; transform: scale(0.95); }
+  }
+  
+}

@@ -1,6 +1,7 @@
 import './globals.css';
 import { ReactNode } from 'react';
 import PushInitializer from '@/components/PushInitializer';
+import { ToastProvider } from '@/lib/contexts/ToastProvider';
 
 export const metadata = {
   title: 'Healty Check',
@@ -31,7 +32,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <PushInitializer />
 
-      <body className="bg-gray-900 text-gray-100">{children}</body>
+      <body className="bg-gray-900 text-gray-100">
+      <ToastProvider>
+
+        {children}
+        </ToastProvider>
+        </body>
+
     </html>
   );
 }

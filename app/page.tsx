@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import CitationBienEtre from '@/components/CitationBienEtre';
 import OptionsMenu from '@/components/OptionsMenu';
+import { authService } from '@/services/authService';
 
 export default function HomePage() {
   const [showOptions, setShowOptions] = useState(false);
@@ -17,6 +18,19 @@ export default function HomePage() {
       }
     }
   }, []);
+
+  const login = async () => {
+    if (authService.isAuthenticated() && !authService.isAdmin()) {
+      router.replace('/profile'); // remplace dans l’historique
+    } else if(authService.isAuthenticated() && authService.isAdmin()) {
+      router.replace('/admin'); // remplace dans l’historique
+    }else{
+      router.replace('/login'); // remplace dans l’historique
+
+    }
+  }
+
+
 
 
   return (
@@ -48,7 +62,7 @@ export default function HomePage() {
       </div>
 
       <button
-        onClick={() => router.push('/login')}
+        onClick={() => login()}
         className="bg-blue-500 text-white px-6 py-2 rounded shadow"
       >
         Accéder à mon espace

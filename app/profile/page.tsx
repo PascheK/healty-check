@@ -1,84 +1,188 @@
 'use client';
 
-import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
-import { useChecklist } from '@/lib/hooks/useChecklist';
-import { useBonBienEtre } from '@/lib/hooks/useBonBienEtre';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+
+import { useModal } from '@/lib/hooks/useModal';
+import { useToast } from '@/lib/hooks/useToast';
+
+import { UserData } from '@/types/user';
+
+import { authService } from '@/services/authService';
+import { userService } from '@/services/userService';
+
 import Checklist from '@/components/Checklist';
-const API_SECRET = 'X9tPz8*Kw3%Vd4!Ln7@';
+import LogoutButton from '@/components/LogoutButton';
+import AddCategoryModal from '@/components/AddCategoryModal';
+import FloatingActions from '@/components/FloatingActions';
+import AddGoalModal from '@/components/AddGoalModal';
 
 export default function ProfilePage() {
-  const user = useCurrentUser(API_SECRET);
+  // 🌟 State
+  const [user, setUser] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadingSync, setLoadingSync] = useState(false);
+
+  // 🌟 Hooks
   const router = useRouter();
+  const { showToast } = useToast();
+  const { isOpen, isClosing, openModal, closeModal } = useModal();
+  const { isOpen: isGoalModalOpen, isClosing: isGoalModalClosing, openModal: openGoalModal, closeModal: closeGoalModal } = useModal();
 
-  const userCode = typeof window !== 'undefined' ? localStorage.getItem('userCode') : null;
-  const { checked, toggle } = useChecklist(userCode);
-  const { bon, cooldown, tirerNouveauBon, bonUtilise, utiliserBon, historique } = useBonBienEtre(userCode, API_SECRET, 12);
-  const [open, setOpen] = useState(true); // Chaque section est ouverte par défaut
+  // 🌟 Initialisation de la page
+  useEffect(() => {
+    const initProfile = async () => {
+      if (!authService.isAuthenticated()) {
+        router.push('/login');
+        return;
+      }
 
-  if (!user) return null;
+      const data = await authService.fetchCurrentUser();
+      if (!data) {
+        console.error('Utilisateur introuvable');
+      }
+
+      setUser(data);
+      setLoading(false);
+    };
+
+    const syncPending = async () => {
+      const pending = userService.getPendingSync();
+      if (pending) {
+        try {
+          await userService.syncCategories(pending.code, pending.categories);
+          userService.removePendingSync();
+          showToast('success', 'Synchronisation automatique réussie ✅');
+        } catch (error) {
+          console.error('Erreur pendant la tentative de resynchronisation', error);
+        }
+      }
+    };
+
+    initProfile();
+    syncPending();
+
+    window.addEventListener('online', syncPending);
+
+    return () => {
+      window.removeEventListener('online', syncPending);
+    };
+  }, [router, showToast]);
+
+  // 🌟 Fonctions
+
+  const handleAddCategory = async (categoryName: string) => {
+    if (!user) return;
+
+    const exists = user.categories.some(
+      (cat) => cat.name.toLowerCase() === categoryName.toLowerCase()
+    );
+
+    if (exists) {
+      showToast('error', 'Catégorie déjà existante ❌');
+      return;
+    }
+
+    const updatedUser = {
+      ...user,
+      categories: [...user.categories, { name: categoryName, goals: [] }],
+    };
+
+    setUser(updatedUser);
+    localStorage.setItem('userData', JSON.stringify(updatedUser));
+    showToast('success', 'Catégorie ajoutée ✅');
+
+    await syncUser(updatedUser);
+  };
+
+  const handleAddGoal = async (categoryName: string, goalTitle: string) => {
+    if (!user) return;
+
+    const foundCategory = user.categories.find((cat) => cat.name === categoryName);
+    if (!foundCategory) return;
+
+    const exists = foundCategory.goals.some(
+      (goal) => goal.title.toLowerCase() === goalTitle.toLowerCase()
+    );
+
+    if (exists) {
+      showToast('error', 'Objectif déjà existant ❌');
+      return;
+    }
+
+    const updatedUser = {
+      ...user,
+      categories: user.categories.map((cat) =>
+        cat.name === categoryName
+          ? { ...cat, goals: [...cat.goals, { title: goalTitle, checked: false }] }
+          : cat
+      ),
+    };
+
+    setUser(updatedUser);
+    localStorage.setItem('userData', JSON.stringify(updatedUser));
+    showToast('success', 'Objectif ajouté 🎯');
+
+    await syncUser(updatedUser);
+  };
+
+  const syncUser = async (updatedUser: UserData) => {
+    try {
+      setLoadingSync(true);
+      await userService.syncCategories(updatedUser.code, updatedUser.categories);
+    } catch (error) {
+      console.error(error);
+      showToast('error', 'Erreur de synchronisation ❌');
+      userService.savePendingSync(updatedUser.code, updatedUser.categories);
+    } finally {
+      setLoadingSync(false);
+    }
+  };
+
+  const toggleGoal = (categoryName: string, goalIndex: number) => {
+    const updated = userService.toggleGoal(user!, categoryName, goalIndex);
+    setUser(updated);
+  };
+
+  // 🌟 Affichage
+  if (loading) {
+    return <p className="text-center p-6 text-white">Chargement...</p>;
+  }
+
+  if (!user) {
+    return <p className="text-center text-red-500">Impossible de récupérer le profil.</p>;
+  }
 
   return (
-    <main className="p-6 max-w-md mx-auto">
-      <h1 className="text-2xl font-semibold mb-4 text-center">
-        Bienvenue, {user.prenom}
+    <main className="p-6 max-w-md mx-auto relative">
+      {loadingSync && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg z-50 animate-pulse">
+          Synchronisation...
+        </div>
+      )}
+
+      <h1 className="text-3xl font-bold text-center mb-6">
+        Salut {user.firstName} {user.lastName} 👋
       </h1>
 
-      {/* Bon cadeau */}
-      {bon && (
-  <div className="bg-gray-800 p-4 rounded mb-6 border border-gray-700">
-    <h2 className="font-semibold text-lg mb-2">🎁 Bon cadeau</h2>
-    <p className="italic text-gray-300">“{bon}”</p>
+      <Checklist categories={user.categories} onToggle={toggleGoal} />
+      <LogoutButton />
+      <FloatingActions onAddCategory={openModal} onAddGoal={openGoalModal} />
 
-    <p className="text-sm text-gray-400 mt-2">
-      ⏳ Temps restant : {Math.ceil(cooldown / 1000 / 60)} min
-    </p>
+      <AddCategoryModal
+        isOpen={isOpen}
+        isClosing={isClosing}
+        onClose={closeModal}
+        onAddCategory={handleAddCategory}
+      />
 
-    <div className="flex justify-center gap-4 mt-4">
-      <button
-        onClick={tirerNouveauBon}
-        disabled={cooldown > 0}
-        className="bg-yellow-500 hover:bg-yellow-400 text-black px-3 py-1 rounded disabled:opacity-50"
-      >
-        🔄 Relancer
-      </button>
-
-      <button
-        onClick={utiliserBon}
-        disabled={bonUtilise}
-        className="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded disabled:opacity-50"
-      >
-        ✅ Utiliser
-      </button>
-    </div>
-  </div>
-)}
-
-      {/* Checklist */}
-      <Checklist user={user} checked={checked} toggle={toggle} />
-
-      {/* Historique */}
-      {historique.length > 0 && (
-  <div className="mt-8">
-    <h2 className="text-lg font-semibold mb-2">🎁 Bons utilisés</h2>
-    <ul className="list-disc ml-6 text-sm text-gray-400">
-      {historique.map((b, i) => (
-        <li key={i}>{b}</li>
-      ))}
-    </ul>
-  </div>
-)}
-
-      <button
-        onClick={() => {
-          localStorage.removeItem('userCode');
-          router.push('/');
-        }}
-        className="mt-6 text-sm underline text-red-500 w-full text-center"
-      >
-        Se déconnecter
-      </button>
+      <AddGoalModal
+        isOpen={isGoalModalOpen}
+        isClosing={isGoalModalClosing}
+        onClose={closeGoalModal}
+        onAddGoal={handleAddGoal}
+        categories={user?.categories.map((c) => c.name) || []}
+      />
     </main>
   );
 }
