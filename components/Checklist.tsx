@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Category } from '@/types/user';
+import { usePendingSync } from '@/lib/hooks/usePendingSync';
 
 type Props = {
   categories: Category[];
@@ -24,10 +25,18 @@ export default function Checklist({ categories, onToggle }: Props) {
     );
   };
 
+  const pendingSync = usePendingSync();
+
+
   // 🌟 Affichage
   return (
     <div className="space-y-4">
-      {categories.map((category, categoryIndex) => (
+      {categories.map((category, categoryIndex) => {
+          const isPending = pendingSync?.categories.some(
+            (pendingCat) => pendingCat.name === category.name
+          );
+        return(
+
         <div
           key={category.name}
           className="rounded border border-gray-700 shadow-sm bg-gray-800 text-gray-100"
@@ -37,7 +46,11 @@ export default function Checklist({ categories, onToggle }: Props) {
             className="flex justify-between items-center px-4 py-3 bg-gray-700 cursor-pointer rounded-t"
             onClick={() => toggleSection(categoryIndex)}
           >
-            <h2 className="text-md font-semibold">{category.name}</h2>
+            <h2 className="text-md font-semibold">{category.name} {isPending && (
+            <span className="text-xs text-yellow-400">
+              🕑 Non synchronisé
+            </span>
+          )}</h2>
             <span className="text-gray-400">
               {openSections[categoryIndex] ? '−' : '+'}
             </span>
@@ -76,7 +89,9 @@ export default function Checklist({ categories, onToggle }: Props) {
             </ul>
           </div>
         </div>
-      ))}
+      )
+      }
+      )}
     </div>
   );
 }

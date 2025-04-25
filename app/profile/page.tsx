@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { useModal } from '@/lib/hooks/useModal';
 import { useToast } from '@/lib/hooks/useToast';
+import { useSyncManager } from '@/lib/hooks/useSyncManager';
 
 import { UserData } from '@/types/user';
 
@@ -28,7 +29,8 @@ export default function ProfilePage() {
   const { showToast } = useToast();
   const { isOpen, isClosing, openModal, closeModal } = useModal();
   const { isOpen: isGoalModalOpen, isClosing: isGoalModalClosing, openModal: openGoalModal, closeModal: closeGoalModal } = useModal();
-
+  const { syncing } = useSyncManager();
+  
   // 🌟 Initialisation de la page
   useEffect(() => {
     const initProfile = async () => {
@@ -83,15 +85,19 @@ export default function ProfilePage() {
       return;
     }
 
+    // ✅ D'abord on modifie le user local
     const updatedUser = {
-      ...user,
-      categories: [...user.categories, { name: categoryName, goals: [] }],
+     ...user,
+     categories: [
+       ...user.categories,
+       { name: categoryName, goals: [] }
+    ],
     };
-
-    setUser(updatedUser);
-    localStorage.setItem('userData', JSON.stringify(updatedUser));
+ 
+    setUser(updatedUser); // 🔥 ça met à jour la vue immédiatement
+    localStorage.setItem('userData', JSON.stringify(updatedUser)); // 🔥 sauvegarde local immédiate
     showToast('success', 'Catégorie ajoutée ✅');
-
+  
     await syncUser(updatedUser);
   };
 
@@ -155,6 +161,11 @@ export default function ProfilePage() {
 
   return (
     <main className="p-6 max-w-md mx-auto relative">
+      {syncing && (
+  <div className="fixed top-2 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black px-4 py-2 rounded-full shadow-lg z-50 animate-pulse">
+    ⏳ Synchronisation en cours...
+  </div>
+)}
       {loadingSync && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg z-50 animate-pulse">
           Synchronisation...
