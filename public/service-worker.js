@@ -43,7 +43,6 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Si réponse réussie, on la clone et on la stocke dans le cache
         const responseClone = response.clone();
         caches.open(CACHE_NAME).then((cache) => {
           cache.put(event.request, responseClone);
@@ -51,9 +50,23 @@ self.addEventListener('fetch', (event) => {
         return response;
       })
       .catch(() => {
-        // Si le fetch échoue (offline), on retourne ce qu’on a en cache
-        return caches.match(event.request).then((response) => {
-          return response || caches.match('/offline.html'); // fallback si tout échoue
+        // Cas d'échec de réseau : OFFLINE
+        return caches.match(event.request).then(async (cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+
+          // 🔥 Test si userData existe dans localStorage (via un fallback spécial)
+          const cache = await caches.open(CACHE_NAME);
+          const userData = await cache.match('/userData.json'); // on utilise une astuce si besoin
+          
+          if (userData) {
+            // S'il y a des données utilisateurs => on reste sur l'app
+            return caches.match('/');
+          }
+
+          // Sinon => vraiment offline
+          return caches.match('/offline.html');
         });
       })
   );
@@ -63,4 +76,25 @@ self.addEventListener('message', (event) => {
   if (event.data?.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
+});
+self.addEventListener('push', function (event) {
+  const data = event.data?.json() || {};
+
+  const title = data.title || 'Nouvelle notification';
+  const options = {
+    body: data.body || 'Vous avez une nouvelle notification 🎯',
+    icon: '/favicon-192x192.png', // ajoute une icône si tu veux
+    badge: '/favicon-192x192.png', // ajoute une icône de notification si tu veux
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+self.addEventListener('notificationclick', function (event) {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow('/') // ➡️ redirige vers ton app quand on clique sur la notif
+  );
 });

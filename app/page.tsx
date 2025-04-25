@@ -10,14 +10,8 @@ export default function HomePage() {
   const [showOptions, setShowOptions] = useState(false);
 
   const router = useRouter();
-  // 🔔 Demander la permission de notifications
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      if (Notification.permission !== 'granted') {
-        Notification.requestPermission();
-      }
-    }
-  }, []);
+
+
 
   const login = async () => {
     if (authService.isAuthenticated() && !authService.isAdmin()) {
