@@ -18,28 +18,40 @@ const requestNotificationPermission = async (): Promise<boolean> => {
 };
 const subscribeToPushNotifications = async (forcedUserId?: string): Promise<void> => {
   if ('serviceWorker' in navigator) {
+    console.log('📡 Tentative d’inscription aux notifications');
+
     const registration = await registerServiceWorker();
+    console.log('✅ Service Worker enregistré');
 
     let userId = forcedUserId;
+    console.log('➡️ forcedUserId reçu:', forcedUserId);
 
     if (!userId) {
       const connectedUser = authService.getUser();
+      console.log('👤 Utilisateur connecté:', connectedUser?.code);
+
       if (connectedUser) {
         userId = connectedUser.code;
       } else {
-        userId = localStorage.getItem('userId') ?? undefined;
+        userId = localStorage.getItem('userId') || undefined;
+        console.log('📦 userId localStorage:', userId);
       }
 
       if (!userId) {
-        userId = `${generateUniqueId()}`;
+        userId = `anon-${generateUniqueId()}`;
         localStorage.setItem('userId', userId);
+        console.log('🆕 Génération d\'un nouvel anonId:', userId);
       }
     }
+
+    console.log('📋 userId utilisé pour abonnement final:', userId);
 
     const subscriptionRaw = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(applicationServerKey),
     });
+
+    console.log('✅ Subscription créée sur device');
 
     const pushSubscription: PushSubscription = {
       endpoint: subscriptionRaw.endpoint,
@@ -51,7 +63,11 @@ const subscribeToPushNotifications = async (forcedUserId?: string): Promise<void
 
     localStorage.setItem('pushSubscription', JSON.stringify(pushSubscription));
 
+    console.log('📤 Envoi au backend :', { userId, pushSubscription });
+
     await sendSubscriptionToBackend(userId, pushSubscription);
+
+    console.log('🎉 Inscription aux notifications terminée pour:', userId);
   }
 };
 
