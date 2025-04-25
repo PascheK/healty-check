@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import CitationBienEtre from '@/components/CitationBienEtre';
-import OptionsMenu from '@/components/OptionsMenu';
-import { authService } from '@/services/authService';
+ import { authService } from '@/services/authService';
+import AnonymousInit from '@/components/AnonymousInit';
 
 export default function HomePage() {
   const [showOptions, setShowOptions] = useState(false);
@@ -51,8 +51,7 @@ export default function HomePage() {
           className="absolute inset-0 bg-black/30 backdrop-blur-sm"
         />
 
-        {/* Menu latéral animé */}
-        <OptionsMenu show={showOptions} onClose={() => setShowOptions(false)} />
+      
       </div>
 
       <button
