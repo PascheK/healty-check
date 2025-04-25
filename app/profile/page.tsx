@@ -17,7 +17,6 @@ import LogoutButton from '@/components/LogoutButton';
 import AddCategoryModal from '@/components/AddCategoryModal';
 import FloatingActions from '@/components/FloatingActions';
 import AddGoalModal from '@/components/AddGoalModal';
-import EnableNotificationsButton from '@/components/notifications/EnableNotificationsButton';
 
 
 export default function ProfilePage() {
@@ -179,7 +178,6 @@ export default function ProfilePage() {
       </h1>
       <div className="p-6 text-white min-h-screen bg-[#1e1e2e] flex flex-col items-center justify-center">
       <h1 className="text-3xl font-bold mb-6">Notifications Push 🚀</h1>
-      <EnableNotificationsButton />
     </div>
       <Checklist categories={user.categories} onToggle={toggleGoal} />
       <LogoutButton />
