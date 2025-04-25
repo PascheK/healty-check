@@ -1,5 +1,6 @@
 import { PushSubscription } from '@/types/notification';
 import { generateUniqueId } from '@/utils/generateUniqueId';
+import { authService } from './authService';
 
 const applicationServerKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY as string;
 
@@ -15,15 +16,21 @@ const requestNotificationPermission = async (): Promise<boolean> => {
   const permission = await Notification.requestPermission();
   return permission === 'granted';
 };
-
-const subscribeToPushNotifications = async (): Promise<void> => {
+const subscribeToPushNotifications = async (forcedUserId?: string): Promise<void> => {
   if ('serviceWorker' in navigator) {
     const registration = await registerServiceWorker();
 
-    let userId = localStorage.getItem('userId');
+    let userId = forcedUserId;
+
     if (!userId) {
-      userId = generateUniqueId();
-      localStorage.setItem('userId', userId);
+      
+      const connectedUser = authService.getUser();
+      if (connectedUser) {
+        userId = connectedUser.code;
+      } else {
+        userId = localStorage.getItem('userId') || generateUniqueId();
+        localStorage.setItem('userId', userId);
+      }
     }
 
     const subscriptionRaw = await registration.pushManager.subscribe({
@@ -31,12 +38,11 @@ const subscribeToPushNotifications = async (): Promise<void> => {
       applicationServerKey: urlBase64ToUint8Array(applicationServerKey),
     });
 
-    // 🛠 Transformation propre ici :
     const pushSubscription: PushSubscription = {
       endpoint: subscriptionRaw.endpoint,
       keys: {
         p256dh: subscriptionRaw.toJSON().keys?.p256dh ?? '',
-        auth: subscriptionRaw.toJSON().keys?.auth ?? '',
+        auth: subscriptionRaw.toJSON().keys?.auth || '',
       },
     };
 
