@@ -1,7 +1,7 @@
 import './globals.css';
 import { ReactNode } from 'react';
-import PushInitializer from '@/components/PushInitializer';
 import { ToastProvider } from '@/lib/contexts/ToastProvider';
+import ServiceWorkerProvider from '@/components/ServiceWorkerProvider';
 
 export const metadata = {
   title: 'Healty Check',
@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  return (
+   return (
     <html lang="fr">
       <head>
           {/* Splashscreens iOS */}
@@ -30,8 +30,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="Healty Check" />
       </head>
-      <PushInitializer />
-
+      <ServiceWorkerProvider /> 
       <body className="bg-gray-900 text-gray-100">
       <ToastProvider>
 
