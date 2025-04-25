@@ -29,6 +29,7 @@ export default function HomePage() {
 
   return (
     <main className="p-6 max-w-md mx-auto flex flex-col items-center justify-center h-screen text-center">
+      <AnonymousInit />
       <h1 className="text-3xl font-bold mb-6">Healty Check</h1>
       <CitationBienEtre />
         {/* ⚙️ Bouton flottant options */}
