@@ -176,9 +176,7 @@ export default function ProfilePage() {
       <h1 className="text-3xl font-bold text-center mb-6">
         Salut {user.firstName} {user.lastName} 👋
       </h1>
-      <div className="p-6 text-white min-h-screen bg-[#1e1e2e] flex flex-col items-center justify-center">
-      <h1 className="text-3xl font-bold mb-6">Notifications Push 🚀</h1>
-    </div>
+ 
       <Checklist categories={user.categories} onToggle={toggleGoal} />
       <LogoutButton />
       <FloatingActions onAddCategory={openModal} onAddGoal={openGoalModal} />
