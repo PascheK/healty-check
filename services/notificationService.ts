@@ -31,7 +31,7 @@ const subscribeToPushNotifications = async (forcedUserId?: string): Promise<void
       }
 
       if (!userId) {
-        userId = `anon-${generateUniqueId()}`;
+        userId = `${generateUniqueId()}`;
         localStorage.setItem('userId', userId);
       }
     }
