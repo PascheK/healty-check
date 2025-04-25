@@ -97,7 +97,7 @@ export const authService = {
    createAnonymousUser : async (): Promise<string> => {
     let anonId = localStorage.getItem('userId');
     if (!anonId) {
-      anonId = `anon-${generateUniqueId()}`;
+      anonId = `${generateUniqueId()}`;
       localStorage.setItem('userId', anonId);
   
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/anonymous`, {
