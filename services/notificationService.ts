@@ -23,12 +23,15 @@ const subscribeToPushNotifications = async (forcedUserId?: string): Promise<void
     let userId = forcedUserId;
 
     if (!userId) {
-      
       const connectedUser = authService.getUser();
       if (connectedUser) {
         userId = connectedUser.code;
       } else {
-        userId = localStorage.getItem('userId') || generateUniqueId();
+        userId = localStorage.getItem('userId') ?? undefined;
+      }
+
+      if (!userId) {
+        userId = `anon-${generateUniqueId()}`;
         localStorage.setItem('userId', userId);
       }
     }
@@ -42,7 +45,7 @@ const subscribeToPushNotifications = async (forcedUserId?: string): Promise<void
       endpoint: subscriptionRaw.endpoint,
       keys: {
         p256dh: subscriptionRaw.toJSON().keys?.p256dh ?? '',
-        auth: subscriptionRaw.toJSON().keys?.auth || '',
+        auth: subscriptionRaw.toJSON().keys?.auth ?? '',
       },
     };
 
@@ -51,6 +54,7 @@ const subscribeToPushNotifications = async (forcedUserId?: string): Promise<void
     await sendSubscriptionToBackend(userId, pushSubscription);
   }
 };
+
 
 const sendSubscriptionToBackend = async (userId: string, subscription: PushSubscription): Promise<void> => {
   await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications/subscribe`, {
