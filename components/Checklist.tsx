@@ -54,7 +54,7 @@ export default function Checklist({
             {modeEdition && (
   <button
     onClick={() => onDeleteCategory(category.name)}
-    className="text-red-400 hover:text-red-600"
+    className="text-red-400 hover:text-red-600 transition-transform duration-300 hover:animate-shake  "
     title="Supprimer catégorie"
   >
     <Trash2 size={18} />
@@ -99,7 +99,7 @@ export default function Checklist({
                   {modeEdition && (
   <button
     onClick={() => onDeleteGoal(category.name, goal.title)}
-    className="text-red-400 hover:text-red-600"
+    className="text-red-400 hover:text-red-600 transition-transform duration-300 hover:animate-shake "
     title="Supprimer objectif"
   >
     <Trash2 size={16} />

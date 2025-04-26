@@ -68,7 +68,7 @@ export default function ProfilePage() {
       if (pending) {
         try {
           await userService.syncCategories(pending.code, pending.categories);
-          userService.removePendingSync();
+          await userService.removePendingSync();
           showToast('success', 'Synchronisation automatique réussie ✅');
         } catch (error) {
           console.error('Erreur pendant la tentative de resynchronisation', error);
@@ -168,7 +168,7 @@ export default function ProfilePage() {
     };
   
     setUser(updatedUser);
-    await storageService.setItem('userData', JSON.stringify(updatedUser));
+    await storageService.setItem('userData', updatedUser);
     showToast('success', 'Catégorie supprimée ✅');
   
     queueSync(updatedUser.code, updatedUser.categories);
@@ -197,7 +197,7 @@ export default function ProfilePage() {
     };
   
     setUser(updatedUser);
-    await storageService.setItem('userData', JSON.stringify(updatedUser));
+    await storageService.setItem('userData', updatedUser);
     showToast('success', 'Objectif supprimé ✅');
   
     queueSync(updatedUser.code, updatedUser.categories);
@@ -232,7 +232,9 @@ export default function ProfilePage() {
         Salut {user.firstName} {user.lastName}
       </h1>
  
-      <Checklist modeEdition  categories={user.categories}
+      <Checklist 
+        modeEdition={modeEdition}
+      categories={user.categories}
   onToggle={toggleGoal}
   onDeleteCategory={handleDeleteCategory}
   onDeleteGoal={handleDeleteGoal} />
