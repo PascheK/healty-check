@@ -207,6 +207,11 @@ export default function ProfilePage() {
     const updated = await userService.toggleGoal(user!, categoryName, goalIndex);
     setUser(updated);
   };
+  const handleLogout = async () => {
+    await authService.logout();
+    router.push('/'); // ou '/connexion' selon tes routes
+  };
+
 
   // 🌟 Affichage
   if (loading) {
@@ -238,8 +243,7 @@ export default function ProfilePage() {
   onToggle={toggleGoal}
   onDeleteCategory={handleDeleteCategory}
   onDeleteGoal={handleDeleteGoal} />
-      <LogoutButton />
-      <FloatingActions onAddCategory={openModal} onAddGoal={openGoalModal} onToggleEdition={() => setModeEdition((prev) => !prev)} modeEdition={modeEdition}  />
+      <FloatingActions onAddCategory={openModal} onAddGoal={openGoalModal} onToggleEdition={() => setModeEdition((prev) => !prev)} modeEdition={modeEdition} onLogout={handleLogout}/>
 
       <AddCategoryModal
         isOpen={isOpen}
