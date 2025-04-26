@@ -4,6 +4,7 @@ import { authService } from './authService';
 
 const applicationServerKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY as string;
 
+// 🔵 1. Enregistrer le Service Worker
 const registerServiceWorker = async (): Promise<ServiceWorkerRegistration> => {
   if ('serviceWorker' in navigator) {
     return await navigator.serviceWorker.register('/service-worker.js');
@@ -12,66 +13,71 @@ const registerServiceWorker = async (): Promise<ServiceWorkerRegistration> => {
   }
 };
 
+// 🔵 2. Demander la permission de notification
 const requestNotificationPermission = async (): Promise<boolean> => {
   const permission = await Notification.requestPermission();
   return permission === 'granted';
 };
-const subscribeToPushNotifications = async (forcedUserId?: string): Promise<void> => {
-  if ('serviceWorker' in navigator) {
-    console.log('📡 Tentative d’inscription aux notifications');
 
-    const registration = await registerServiceWorker();
-    console.log('✅ Service Worker enregistré');
-
-    let userId = forcedUserId;
-    console.log('➡️ forcedUserId reçu:', forcedUserId);
-
-    if (!userId) {
-      const connectedUser = authService.getUser();
-      console.log('👤 Utilisateur connecté:', connectedUser?.code);
-
-      if (connectedUser) {
-        userId = connectedUser.code;
-      } else {
-        userId = localStorage.getItem('userId') || undefined;
-        console.log('📦 userId localStorage:', userId);
-      }
-
-      if (!userId) {
-        userId = `anon-${generateUniqueId()}`;
-        localStorage.setItem('userId', userId);
-        console.log('🆕 Génération d\'un nouvel anonId:', userId);
-      }
-    }
-
-    console.log('📋 userId utilisé pour abonnement final:', userId);
-
-    const subscriptionRaw = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(applicationServerKey),
-    });
-
-    console.log('✅ Subscription créée sur device');
-
-    const pushSubscription: PushSubscription = {
-      endpoint: subscriptionRaw.endpoint,
-      keys: {
-        p256dh: subscriptionRaw.toJSON().keys?.p256dh ?? '',
-        auth: subscriptionRaw.toJSON().keys?.auth ?? '',
-      },
-    };
-
-    localStorage.setItem('pushSubscription', JSON.stringify(pushSubscription));
-
-    console.log('📤 Envoi au backend :', { userId, pushSubscription });
-
-    await sendSubscriptionToBackend(userId, pushSubscription);
-
-    console.log('🎉 Inscription aux notifications terminée pour:', userId);
-  }
+// 🔵 3. Vérifier si une subscription existe déjà
+const alreadySubscribed = async (): Promise<boolean> => {
+  const registration = await navigator.serviceWorker.ready;
+  const subscription = await registration.pushManager.getSubscription();
+  return !!subscription;
 };
 
+// 🔵 4. Souscrire aux notifications
+const subscribeToPushNotifications = async (forcedUserId?: string): Promise<void> => {
+  if (!('serviceWorker' in navigator)) return;
 
+  console.log('📡 Tentative d’inscription aux notifications');
+
+  const registration = await navigator.serviceWorker.ready;
+  console.log('✅ Service Worker prêt');
+
+  let userId = forcedUserId;
+
+  if (!userId) {
+    const connectedUser = authService.getUser();
+    if (connectedUser) {
+      userId = connectedUser.code;
+    } else {
+      userId = localStorage.getItem('userId') || undefined;
+    }
+
+    if (!userId) {
+      userId = `anon-${generateUniqueId()}`;
+      localStorage.setItem('userId', userId);
+    }
+  }
+
+  console.log('📋 userId utilisé pour abonnement:', userId);
+
+  const subscriptionRaw = await registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(applicationServerKey),
+  });
+
+  console.log('✅ Subscription créée:', subscriptionRaw);
+
+  const pushSubscription: PushSubscription = {
+    endpoint: subscriptionRaw.endpoint,
+    keys: {
+      p256dh: subscriptionRaw.toJSON().keys?.p256dh ?? '',
+      auth: subscriptionRaw.toJSON().keys?.auth ?? '',
+    },
+  };
+
+  localStorage.setItem('pushSubscription', JSON.stringify(pushSubscription));
+
+  console.log('📤 Envoi au backend :', { userId, pushSubscription });
+
+  await sendSubscriptionToBackend(userId, pushSubscription);
+
+  console.log('🎉 Inscription terminée pour:', userId);
+};
+
+// 🔵 5. Envoyer au backend
 const sendSubscriptionToBackend = async (userId: string, subscription: PushSubscription): Promise<void> => {
   await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications/subscribe`, {
     method: 'POST',
@@ -80,7 +86,7 @@ const sendSubscriptionToBackend = async (userId: string, subscription: PushSubsc
   });
 };
 
-// Utile pour convertir la clé VAPID
+// 🔵 6. Convertisseur VAPID clé
 const urlBase64ToUint8Array = (base64String: string): Uint8Array => {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -88,7 +94,11 @@ const urlBase64ToUint8Array = (base64String: string): Uint8Array => {
   return new Uint8Array([...rawData].map((char) => char.charCodeAt(0)));
 };
 
+// 🎯 Service final
 export const notificationService = {
   requestNotificationPermission,
+  registerServiceWorker,
+  alreadySubscribed,
   subscribeToPushNotifications,
+  sendSubscriptionToBackend,
 };
