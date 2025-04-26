@@ -11,6 +11,7 @@ import { useModal } from '@/lib/hooks/useModal';
 import AddUserModal from '@/components/admin/AddUserModal';
 import UserListModal from '@/components/admin/UserListModal';
 import LogoutButton from '@/components/LogoutButton';
+import SendNotificationModal from '@/components/admin/SendNotificationModal';
 
 export default function AdminPage() {
   // 🌟 State
@@ -21,6 +22,7 @@ export default function AdminPage() {
   const router = useRouter();
   const { isOpen: isAddOpen, isClosing: isAddClosing, openModal: openAddModal, closeModal: closeAddModal } = useModal();
   const { isOpen: isListOpen, isClosing: isListClosing, openModal: openListModal, closeModal: closeListModal } = useModal();
+  const { isOpen: isNotifOpen, isClosing: isNotifClosing, openModal: openNotifModal, closeModal: closeNotifModal } = useModal();
 
   // 🌟 Vérifier l'authentification admin
   useEffect(() => {
@@ -91,7 +93,14 @@ export default function AdminPage() {
         >
           👥 Voir les utilisateurs
         </button>
-      </section>
+        <button
+  onClick={openNotifModal}
+  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+>
+  📣 Envoyer une notification
+</button>
+        
+              </section>
 
       <AddUserModal
         isOpen={isAddOpen}
@@ -107,6 +116,12 @@ export default function AdminPage() {
       />
 
       <LogoutButton />
+      <SendNotificationModal
+  isOpen={isNotifOpen}
+  isClosing={isNotifClosing}
+  onClose={closeNotifModal}
+/>
+
     </main>
   );
 }

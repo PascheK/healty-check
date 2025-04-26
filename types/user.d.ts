@@ -14,4 +14,5 @@ export interface UserData {
   lastName: string;
   categories: Category[];
   role?: 'admin' | 'user';
+  subscription?: any; // A modifier 
 }

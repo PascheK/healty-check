@@ -115,7 +115,6 @@ export const userService = {
       console.log('📥 Fusion sauvegardée dans pendingSync');
 
     } else {
-      console.log('🆕 Aucun pending existant, on crée un nouveau');
       await storageService.setItem('pendingSync', { code, categories: newCategories });
       console.log('📥 Nouvelle sauvegarde dans pendingSync');
     }
@@ -128,5 +127,10 @@ export const userService = {
   getPendingSync: async (): Promise<{ code: string; categories: Category[] } | null> => {
     const pending = await storageService.getItem('pendingSync');
     return pending ? pending as { code: string; categories: Category[] } : null;
+  },
+
+  getUsersWithSubscription: async (): Promise<UserData[]> => {
+    const allUsers = await userService.getAll();
+    return allUsers.filter((u) => u.subscription); // Filtre uniquement ceux qui ont subscription
   },
 };

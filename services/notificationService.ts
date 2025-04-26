@@ -95,6 +95,15 @@ const urlBase64ToUint8Array = (base64String: string): Uint8Array => {
   return new Uint8Array([...rawData].map((char) => char.charCodeAt(0)));
 };
 
+
+const sendNotification = async (userCode: string, message: string) => {
+  await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications/send-notification`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userCode, message }),
+  });
+};
+
 // 🎯 Service final
 export const notificationService = {
   requestNotificationPermission,
@@ -102,4 +111,5 @@ export const notificationService = {
   alreadySubscribed,
   subscribeToPushNotifications,
   sendSubscriptionToBackend,
+  sendNotification
 };
