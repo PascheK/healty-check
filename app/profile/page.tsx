@@ -149,6 +149,43 @@ export default function ProfilePage() {
 
   };
 
+  const handleDeleteCategory = async (categoryName: string) => {
+    if (!user) return;
+  
+    const updatedUser = {
+      ...user,
+      categories: user.categories.filter((cat) => cat.name !== categoryName),
+    };
+  
+    setUser(updatedUser);
+    await storageService.setItem('userData', JSON.stringify(updatedUser));
+    showToast('success', 'Catégorie supprimée ✅');
+  
+    queueSync(updatedUser.code, updatedUser.categories);
+  };
+  
+  const handleDeleteGoal = async (categoryName: string, goalTitle: string) => {
+    if (!user) return;
+  
+    const updatedUser = {
+      ...user,
+      categories: user.categories.map((cat) =>
+        cat.name === categoryName
+          ? {
+              ...cat,
+              goals: cat.goals.filter((goal) => goal.title !== goalTitle),
+            }
+          : cat
+      ),
+    };
+  
+    setUser(updatedUser);
+    await storageService.setItem('userData', JSON.stringify(updatedUser));
+    showToast('success', 'Objectif supprimé ✅');
+  
+    queueSync(updatedUser.code, updatedUser.categories);
+  };
+
   const toggleGoal = async (categoryName: string, goalIndex: number) => {
     const updated = await userService.toggleGoal(user!, categoryName, goalIndex);
     setUser(updated);
@@ -173,10 +210,13 @@ export default function ProfilePage() {
  
 
       <h1 className="text-3xl font-bold text-center mb-6">
-        Salut {user.firstName} {user.lastName} 👋
+        Salut {user.firstName} {user.lastName}
       </h1>
  
-      <Checklist categories={user.categories} onToggle={toggleGoal} />
+      <Checklist   categories={user.categories}
+  onToggle={toggleGoal}
+  onDeleteCategory={handleDeleteCategory}
+  onDeleteGoal={handleDeleteGoal} />
       <LogoutButton />
       <FloatingActions onAddCategory={openModal} onAddGoal={openGoalModal} />
 
