@@ -87,33 +87,53 @@ export const userService = {
 
   // 🧠 Gestion du pendingSync (localStorage)
   savePendingSync: (code: string, newCategories: Category[]) => {
+    console.log('📝 Début de savePendingSync');
+    console.log('➡️ Code utilisateur:', code);
+    console.log('➡️ Nouvelles catégories reçues:', newCategories);
+  
     const pending = userService.getPendingSync();
+    console.log('📦 Pending actuel dans localStorage:', pending);
   
     if (pending && pending.code === code) {
+      console.log('🔄 Fusion avec les données existantes');
+  
       // 🔥 Fusionner intelligemment les catégories
       const mergedCategories: Category[] = [...pending.categories];
   
       newCategories.forEach((newCat) => {
         const existingCat = mergedCategories.find((cat) => cat.name === newCat.name);
         if (existingCat) {
+          console.log(`🔍 Catégorie existante trouvée: ${newCat.name}`);
+          
           // ➡️ Ajouter uniquement les nouveaux objectifs
           newCat.goals.forEach((newGoal) => {
-            if (!existingCat.goals.some((g) => g.title === newGoal.title)) {
+            const alreadyExists = existingCat.goals.some((g) => g.title === newGoal.title);
+            if (!alreadyExists) {
+              console.log(`➕ Ajout de l'objectif: ${newGoal.title} dans ${existingCat.name}`);
               existingCat.goals.push(newGoal);
+            } else {
+              console.log(`⚠️ Objectif déjà présent: ${newGoal.title} dans ${existingCat.name}`);
             }
           });
+  
         } else {
-          // ➡️ Nouvelle catégorie complète
+          console.log(`🆕 Nouvelle catégorie ajoutée: ${newCat.name}`);
           mergedCategories.push(newCat);
         }
       });
   
+      console.log('✅ Résultat final fusionné:', mergedCategories);
+  
       localStorage.setItem('pendingSync', JSON.stringify({ code, categories: mergedCategories }));
+      console.log('📥 Fusion sauvegardée dans pendingSync');
+      
     } else {
-      // ➡️ Pas d'existant ➔ sauvegarder tel quel
+      console.log('🆕 Aucun pending existant, on crée un nouveau');
       localStorage.setItem('pendingSync', JSON.stringify({ code, categories: newCategories }));
+      console.log('📥 Nouvelle sauvegarde dans pendingSync');
     }
   },
+  
 
   removePendingSync: () => {
     localStorage.removeItem('pendingSync');
