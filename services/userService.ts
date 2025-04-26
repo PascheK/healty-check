@@ -1,19 +1,17 @@
-// services/userService.ts
-
 import { UserData, Category } from '@/types/user';
+import { storageService } from './storageService';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const userService = {
   // 🧠 Toggle un objectif (local + sync backend)
-  toggleGoal: (user: UserData, categoryName: string, goalIndex: number): UserData => {
+  toggleGoal: async (user: UserData, categoryName: string, goalIndex: number): Promise<UserData> => {
     const updated = { ...user };
     const category = updated.categories.find((c) => c.name === categoryName);
     if (!category) return user;
 
     category.goals[goalIndex].checked = !category.goals[goalIndex].checked;
-
-    localStorage.setItem('userData', JSON.stringify(updated));
+    await storageService.setItem('userData', updated); // 🔥 PAS besoin de JSON.stringify
 
     fetch(`${API_URL}/api/users/${user.code}/goals`, {
       method: 'PUT',
@@ -40,22 +38,14 @@ export const userService = {
   // 🧠 Récupérer un utilisateur par son code
   fetchUser: async (code: string): Promise<UserData> => {
     const res = await fetch(`${API_URL}/api/users/${code}`);
-
-    if (!res.ok) {
-      throw new Error('Erreur lors du chargement du profil');
-    }
-
+    if (!res.ok) throw new Error('Erreur lors du chargement du profil');
     return res.json();
   },
 
   // 🧠 Récupérer tous les utilisateurs
   getAll: async (): Promise<UserData[]> => {
     const res = await fetch(`${API_URL}/api/users`);
-
-    if (!res.ok) {
-      throw new Error('Erreur lors du chargement des utilisateurs');
-    }
-
+    if (!res.ok) throw new Error('Erreur lors du chargement des utilisateurs');
     return res.json();
   },
 
@@ -85,27 +75,25 @@ export const userService = {
     }
   },
 
-  // 🧠 Gestion du pendingSync (localStorage)
-  savePendingSync: (code: string, newCategories: Category[]) => {
+  // 🧠 Gestion du pendingSync
+  savePendingSync: async (code: string, newCategories: Category[]) => {
     console.log('📝 Début de savePendingSync');
     console.log('➡️ Code utilisateur:', code);
     console.log('➡️ Nouvelles catégories reçues:', newCategories);
-  
-    const pending = userService.getPendingSync();
-    console.log('📦 Pending actuel dans localStorage:', pending);
-  
+
+    const pending = await userService.getPendingSync(); // 🔥 ATTENDRE l'IndexedDB
+    console.log('📦 Pending actuel dans IndexedDB:', pending);
+
     if (pending && pending.code === code) {
       console.log('🔄 Fusion avec les données existantes');
-  
-      // 🔥 Fusionner intelligemment les catégories
+
       const mergedCategories: Category[] = [...pending.categories];
-  
+
       newCategories.forEach((newCat) => {
         const existingCat = mergedCategories.find((cat) => cat.name === newCat.name);
         if (existingCat) {
           console.log(`🔍 Catégorie existante trouvée: ${newCat.name}`);
-          
-          // ➡️ Ajouter uniquement les nouveaux objectifs
+
           newCat.goals.forEach((newGoal) => {
             const alreadyExists = existingCat.goals.some((g) => g.title === newGoal.title);
             if (!alreadyExists) {
@@ -115,32 +103,30 @@ export const userService = {
               console.log(`⚠️ Objectif déjà présent: ${newGoal.title} dans ${existingCat.name}`);
             }
           });
-  
+
         } else {
           console.log(`🆕 Nouvelle catégorie ajoutée: ${newCat.name}`);
           mergedCategories.push(newCat);
         }
       });
-  
+
       console.log('✅ Résultat final fusionné:', mergedCategories);
-  
-      localStorage.setItem('pendingSync', JSON.stringify({ code, categories: mergedCategories }));
+      await storageService.setItem('pendingSync', { code, categories: mergedCategories });
       console.log('📥 Fusion sauvegardée dans pendingSync');
-      
+
     } else {
       console.log('🆕 Aucun pending existant, on crée un nouveau');
-      localStorage.setItem('pendingSync', JSON.stringify({ code, categories: newCategories }));
+      await storageService.setItem('pendingSync', { code, categories: newCategories });
       console.log('📥 Nouvelle sauvegarde dans pendingSync');
     }
   },
-  
 
-  removePendingSync: () => {
-    localStorage.removeItem('pendingSync');
+  removePendingSync: async () => {
+    await storageService.removeItem('pendingSync');
   },
 
-  getPendingSync: (): { code: string; categories: Category[] } | null => {
-    const pending = localStorage.getItem('pendingSync');
-    return pending ? JSON.parse(pending) : null;
+  getPendingSync: async (): Promise<{ code: string; categories: Category[] } | null> => {
+    const pending = await storageService.getItem('pendingSync');
+    return pending ? pending as { code: string; categories: Category[] } : null;
   },
 };

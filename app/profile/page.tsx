@@ -17,6 +17,7 @@ import LogoutButton from '@/components/LogoutButton';
 import AddCategoryModal from '@/components/AddCategoryModal';
 import FloatingActions from '@/components/FloatingActions';
 import AddGoalModal from '@/components/AddGoalModal';
+import { storageService } from '@/services/storageService';
 
 
 export default function ProfilePage() {
@@ -34,7 +35,7 @@ export default function ProfilePage() {
   // 🌟 Initialisation de la page
   useEffect(() => {
     const initProfile = async () => {
-      if (!authService.isAuthenticated()) {
+      if (!await authService.isAuthenticated()) {
         router.push('/login');
         return;
       }
@@ -49,7 +50,7 @@ export default function ProfilePage() {
     };
 
     const syncPending = async () => {
-      const pending = userService.getPendingSync();
+      const pending = await  userService.getPendingSync();
       if (pending) {
         try {
           await userService.syncCategories(pending.code, pending.categories);
@@ -95,8 +96,7 @@ export default function ProfilePage() {
     };
  
     setUser(updatedUser); // 🔥 ça met à jour la vue immédiatement
-    console.log('🔵 User après ajout:', updatedUser);
-    localStorage.setItem('userData', JSON.stringify(updatedUser)); // 🔥 sauvegarde local immédiate
+    await storageService.setItem('userData', updatedUser);
     showToast('success', 'Catégorie ajoutée ✅');
   
     queueSync(updatedUser.code, updatedUser.categories); // ➡️ NOUVEAU : file d'attente
@@ -129,15 +129,16 @@ export default function ProfilePage() {
 
     setUser(updatedUser);
     console.log('🔵 User après ajout:', updatedUser);
-    localStorage.setItem('userData', JSON.stringify(updatedUser));
+    await storageService.setItem('userData', updatedUser);
+   
     showToast('success', 'Objectif ajouté 🎯');
 
     queueSync(updatedUser.code, updatedUser.categories); // ➡️ Utiliser la file d'attente aussi
 
   };
 
-  const toggleGoal = (categoryName: string, goalIndex: number) => {
-    const updated = userService.toggleGoal(user!, categoryName, goalIndex);
+  const toggleGoal = async (categoryName: string, goalIndex: number) => {
+    const updated = await userService.toggleGoal(user!, categoryName, goalIndex);
     setUser(updated);
   };
 

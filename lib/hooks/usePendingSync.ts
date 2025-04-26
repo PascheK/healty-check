@@ -1,5 +1,3 @@
-// lib/hooks/usePendingSync.ts
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -10,13 +8,17 @@ export function usePendingSync() {
   const [pendingSync, setPendingSync] = useState<{ code: string; categories: Category[] } | null>(null);
 
   useEffect(() => {
-    const pending = userService.getPendingSync();
-    if (pending) {
-      setPendingSync(pending);
-    }
+    const loadPendingSync = async () => {
+      const pending = await userService.getPendingSync();
+      if (pending) {
+        setPendingSync(pending);
+      }
+    };
+
+    loadPendingSync();
 
     const handleOnline = async () => {
-      const pendingNow = userService.getPendingSync();
+      const pendingNow = await userService.getPendingSync();
       if (pendingNow) {
         setPendingSync(pendingNow);
       } else {

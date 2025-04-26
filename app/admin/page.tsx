@@ -19,17 +19,23 @@ export default function AdminPage() {
 
   // 🌟 Hooks
   const router = useRouter();
-
   const { isOpen: isAddOpen, isClosing: isAddClosing, openModal: openAddModal, closeModal: closeAddModal } = useModal();
   const { isOpen: isListOpen, isClosing: isListClosing, openModal: openListModal, closeModal: closeListModal } = useModal();
 
   // 🌟 Vérifier l'authentification admin
   useEffect(() => {
-    if (!authService.isAuthenticated() || !authService.isAdmin()) {
-      router.replace('/');
-    } else {
-      setAuthorized(true);
-    }
+    const checkAuth = async () => {
+      const isAuth = await authService.isAuthenticated();
+      const isAdmin = await authService.isAdmin();
+
+      if (!isAuth || !isAdmin) {
+        router.replace('/');
+      } else {
+        setAuthorized(true);
+      }
+    };
+
+    checkAuth();
   }, [router]);
 
   // 🌟 Gestion des handlers
@@ -52,9 +58,9 @@ export default function AdminPage() {
     setTimeout(() => setMessage(''), 3000);
   };
 
-  // 🌟 Rendu conditionnel si pas encore autorisé
+  // 🌟 Rendu conditionnel
   if (!authorized) {
-    return null; // Option: ajouter un spinner "Chargement..." si tu veux
+    return null; // Tu peux aussi afficher un spinner de chargement si tu veux
   }
 
   // 🌟 Affichage principal

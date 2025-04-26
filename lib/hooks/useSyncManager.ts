@@ -10,7 +10,7 @@ export function useSyncManager() {
   const [syncing, setSyncing] = useState(false);
 
   const trySyncPending = useCallback(async () => {
-    const pending = userService.getPendingSync();
+    const pending = await userService.getPendingSync();
     if (!pending || !navigator.onLine) return;
 
     try {

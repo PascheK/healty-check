@@ -17,15 +17,21 @@ export default function LoginPage() {
 
   // 🌟 Vérifier si déjà connecté
   useEffect(() => {
-    if (authService.isAuthenticated()) {
-      if (authService.isAdmin()) {
-        router.replace('/admin');
+    const checkAuth = async () => {
+      const isAuth = await authService.isAuthenticated();
+      if (isAuth) {
+        const isAdmin = await authService.isAdmin();
+        if (isAdmin) {
+          router.replace('/admin');
+        } else {
+          router.replace('/profile');
+        }
       } else {
-        router.replace('/profile');
+        setCheckingAuth(false);
       }
-    } else {
-      setCheckingAuth(false);
-    }
+    };
+
+    checkAuth();
   }, [router]);
 
   // 🌟 Gestion du login
@@ -36,7 +42,8 @@ export default function LoginPage() {
     try {
       await authService.login(code);
 
-      if (authService.isAdmin()) {
+      const isAdmin = await authService.isAdmin();
+      if (isAdmin) {
         router.push('/admin');
       } else {
         router.push('/profile');
@@ -52,7 +59,7 @@ export default function LoginPage() {
     }
   };
 
-  // 🌟 Chargement de la vérification d'auth
+  // 🌟 Affichage loading pendant check
   if (checkingAuth) {
     return (
       <main className="min-h-screen bg-[#1e1e2e] flex items-center justify-center">
@@ -61,7 +68,7 @@ export default function LoginPage() {
     );
   }
 
-  // 🌟 Affichage du formulaire de connexion
+  // 🌟 Formulaire
   return (
     <main className="min-h-screen bg-[#1e1e2e] text-white flex items-center justify-center p-6">
       <div className="bg-[#2a2a3d] rounded-xl shadow-xl p-6 max-w-sm w-full">

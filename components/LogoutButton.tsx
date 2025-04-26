@@ -6,8 +6,8 @@ import { authService } from '@/services/authService';
 export default function LogoutButton() {
   const router = useRouter();
 
-  const handleLogout = () => {
-    authService.logout();
+  const handleLogout = async () => {
+    await authService.logout();
     router.push('/login'); // ou '/connexion' selon tes routes
   };
 

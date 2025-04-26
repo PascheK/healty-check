@@ -1,10 +1,10 @@
 const CACHE_NAME = 'healthy-check-cache-v1';
 const urlsToCache = [
-  '/', // la page d'accueil
-  '/offline.html', // page personnalisée si complètement offline (optionnelle)
+  '/',
+  '/offline.html',
 ];
 
-// 📦 Lors de l'installation du Service Worker
+// 📦 Installation du Service Worker
 self.addEventListener('install', (event) => {
   console.log('Service Worker : Installation ✅');
 
@@ -15,10 +15,10 @@ self.addEventListener('install', (event) => {
     })
   );
 
-  self.skipWaiting(); // Active immédiatement sans attendre
+  self.skipWaiting();
 });
 
-// 📦 Lors de l'activation du Service Worker
+// 📦 Activation du Service Worker
 self.addEventListener('activate', (event) => {
   console.log('Service Worker : Activation ✅');
 
@@ -35,48 +35,48 @@ self.addEventListener('activate', (event) => {
     )
   );
 
-  self.clients.claim(); // Prend directement le contrôle des pages ouvertes
+  self.clients.claim();
 });
 
-// 📦 Intercepter les requêtes réseau
+// 📦 Interception des requêtes
 self.addEventListener('fetch', (event) => {
+  // ✅ Important : n’intercepter que les GET
+  if (event.request.method !== 'GET') {
+    return; // Ne pas interférer avec les POST, PUT, DELETE etc.
+  }
+
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseClone);
-        });
-        return response;
-      })
-      .catch(() => {
-        // Cas d'échec de réseau : OFFLINE
-        return caches.match(event.request).then(async (cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
+    caches.match(event.request)
+      .then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse; // ➡️ Si trouvé dans cache
+        }
 
-          // 🔥 Test si userData existe dans localStorage (via un fallback spécial)
-          const cache = await caches.open(CACHE_NAME);
-          const userData = await cache.match('/userData.json'); // on utilise une astuce si besoin
-          
-          if (userData) {
-            // S'il y a des données utilisateurs => on reste sur l'app
-            return caches.match('/');
-          }
+        return fetch(event.request)
+          .then((response) => {
+            // ✅ Seulement mettre en cache si c’est un 200 OK
+            if (!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
+            }
 
-          // Sinon => vraiment offline
-          return caches.match('/offline.html');
-        });
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+
+            return response;
+          })
+          .catch(() => {
+            // 🌪️ Si réseau échoué ET pas de cache
+            if (event.request.destination === 'document') {
+              return caches.match('/offline.html');
+            }
+          });
       })
   );
 });
 
-self.addEventListener('message', (event) => {
-  if (event.data?.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-});
+// 📩 Gestion du push notification
 self.addEventListener('push', function(event) {
   console.log('📩 Push reçu:', event);
 
@@ -85,11 +85,11 @@ self.addEventListener('push', function(event) {
 
     const options = {
       body: data.body,
-      icon: '/favicon.png', // IMPORTANT sur iOS !
-      badge: '/favicon.png', // Optionnel mais conseillé
+      icon: '/favicon.png',
+      badge: '/favicon.png',
       data: {
-        url: '/' // Redirection quand l'utilisateur clique
-      }
+        url: '/',
+      },
     };
 
     event.waitUntil(
@@ -100,9 +100,17 @@ self.addEventListener('push', function(event) {
   }
 });
 
+// 🎯 Clique sur notification
 self.addEventListener('notificationclick', function (event) {
   event.notification.close();
   event.waitUntil(
-    clients.openWindow('/') // ➡️ redirige vers ton app quand on clique sur la notif
+    clients.openWindow('/')
   );
+});
+
+// 🔄 Pour forcer update du service worker
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });

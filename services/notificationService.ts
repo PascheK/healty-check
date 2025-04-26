@@ -1,6 +1,7 @@
 import { PushSubscription } from '@/types/notification';
 import { generateUniqueId } from '@/utils/generateUniqueId';
 import { authService } from './authService';
+import { storageService } from './storageService';
 
 const applicationServerKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY as string;
 
@@ -38,16 +39,16 @@ const subscribeToPushNotifications = async (forcedUserId?: string): Promise<void
   let userId = forcedUserId;
 
   if (!userId) {
-    const connectedUser = authService.getUser();
+    const connectedUser = await authService.getUser(); // ← await ici obligatoire
     if (connectedUser) {
       userId = connectedUser.code;
     } else {
-      userId = localStorage.getItem('userId') || undefined;
+      userId = await storageService.getItem('userId') || undefined;
     }
 
     if (!userId) {
       userId = `anon-${generateUniqueId()}`;
-      localStorage.setItem('userId', userId);
+      await storageService.setItem('userId', userId);
     }
   }
 
@@ -68,7 +69,7 @@ const subscribeToPushNotifications = async (forcedUserId?: string): Promise<void
     },
   };
 
-  localStorage.setItem('pushSubscription', JSON.stringify(pushSubscription));
+  await storageService.setItem('pushSubscription', pushSubscription); // 🔥 pas besoin de stringify
 
   console.log('📤 Envoi au backend :', { userId, pushSubscription });
 

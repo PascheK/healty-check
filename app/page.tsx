@@ -14,9 +14,9 @@ export default function HomePage() {
 
 
   const login = async () => {
-    if (authService.isAuthenticated() && !authService.isAdmin()) {
+    if (await authService.isAuthenticated() && await !authService.isAdmin()) {
       router.replace('/profile'); // remplace dans l’historique
-    } else if(authService.isAuthenticated() && authService.isAdmin()) {
+    } else if(await authService.isAuthenticated() && await authService.isAdmin()) {
       router.replace('/admin'); // remplace dans l’historique
     }else{
       router.replace('/login'); // remplace dans l’historique

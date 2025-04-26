@@ -2,6 +2,7 @@
 import { generateUniqueId } from '@/utils/generateUniqueId';
 import { UserData } from '@/types/user';
 import { notificationService } from '@/services/notificationService';
+import { storageService } from './storageService';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -13,18 +14,18 @@ export const authService = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code }),
     });
-  
+
     if (!res.ok) {
       throw new Error('Code invalide');
     }
-  
+
     const user = await res.json();
-    localStorage.setItem('userCode', user.code);
-    localStorage.setItem('userData', JSON.stringify(user));
-  
+    await storageService.setItem('userCode', user.code);
+    await storageService.setItem('userData', user); // ⬅️ Pas besoin de stringify
+
     // 🔁 Fusion avec un compte anonyme s’il existe
-    const anonId = localStorage.getItem('userId');
-  
+    const anonId = await storageService.getItem('userId');
+
     if (anonId && anonId.startsWith('anon-') && anonId !== user.code) {
       try {
         await fetch(`${API_URL}/api/notifications/merge`, {
@@ -35,44 +36,45 @@ export const authService = {
             toUserId: user.code,
           }),
         });
-  
+
         console.log('✅ Migration de l’abonnement depuis', anonId);
-        localStorage.removeItem('userId');
+        await storageService.removeItem('userId');
       } catch (err) {
         console.error('❌ Erreur migration subscription:', err);
       }
     }
-  
+
     return user;
   },
 
   // 🧠 Logout utilisateur
-  logout: () => {
-    localStorage.removeItem('userCode');
-    localStorage.removeItem('userData');
-    localStorage.removeItem('token');
+  logout: async () => {
+    await storageService.removeItem('userCode');
+    await storageService.removeItem('userData');
+    await storageService.removeItem('token');
   },
 
   // 🧠 Vérifie si utilisateur connecté
-  isAuthenticated: (): boolean => {
-    return !!localStorage.getItem('userCode');
+  isAuthenticated: async (): Promise<boolean> => {
+    const code = await storageService.getItem('userCode');
+    return !!code;
   },
 
   // 🧠 Vérifie si utilisateur est admin
-  isAdmin: (): boolean => {
-    const user = authService.getUser();
+  isAdmin: async (): Promise<boolean> => {
+    const user = await authService.getUser();
     return user?.role === 'admin';
   },
 
-  // 🧠 Récupérer l'utilisateur du localStorage
-  getUser: (): UserData | null => {
-    const user = localStorage.getItem('userData');
-    return user ? JSON.parse(user) : null;
+  // 🧠 Récupérer l'utilisateur du storage
+  getUser: async (): Promise<UserData | null> => {
+    const user = await storageService.getItem<UserData>('userData');
+    return user ?? null;
   },
 
   // 🧠 Charger l'utilisateur depuis l'API
   fetchCurrentUser: async (): Promise<UserData | null> => {
-    const code = localStorage.getItem('userCode');
+    const code = await storageService.getItem('userCode');
     if (!code) return null;
 
     try {
@@ -82,39 +84,41 @@ export const authService = {
       }
 
       const user: UserData = await res.json();
-      localStorage.setItem('userData', JSON.stringify(user));
+      await storageService.setItem('userData', user);
       return user;
     } catch (error) {
-      const cachedUser = authService.getUser();
+      console.error('❌ Erreur serveur, tentative de récupération cache');
+      const cachedUser = await authService.getUser();
       if (cachedUser) {
         return cachedUser;
       }
-
-      console.error('❌ Aucun cache utilisateur disponible');
       return null;
     }
   },
-   createAnonymousUser : async (): Promise<string> => {
-    let anonId = localStorage.getItem('userId');
+
+  // 🧠 Créer un utilisateur anonyme
+  createAnonymousUser: async (): Promise<string> => {
+    let anonId = await storageService.getItem('userId');
+
     if (!anonId) {
-      anonId = `${generateUniqueId()}`;
-      localStorage.setItem('userId', anonId);
-  
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/anonymous`, {
+      anonId = `anon-${generateUniqueId()}`;
+      await storageService.setItem('userId', anonId);
+
+      await fetch(`${API_URL}/api/users/anonymous`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: anonId }),
       });
     }
-  
-    // ➡️ Ensuite, tenter inscription aux notifications directement
+
+    // ➡️ Ensuite, tentative inscription aux notifications
     try {
       await notificationService.subscribeToPushNotifications(anonId);
       console.log('✅ Abonnement push lié à l\'utilisateur anonyme');
     } catch (error) {
       console.error('❌ Erreur abonnement push anonyme:', error);
     }
-  
+
     return anonId;
-  }
+  },
 };

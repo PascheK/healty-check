@@ -10,7 +10,6 @@ type Props = {
 };
 
 export default function Checklist({ categories, onToggle }: Props) {
-  console.log('📋 Categories reçues dans Checklist:', categories);
 
   // 🌟 State
   const [openSections, setOpenSections] = useState<boolean[]>([]);
