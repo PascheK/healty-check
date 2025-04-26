@@ -1,14 +1,16 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Plus, FolderPlus, Target } from 'lucide-react';
+import { Plus, FolderPlus, Target, Pencil, X } from 'lucide-react';
 
 type Props = {
   onAddCategory: () => void;
   onAddGoal: () => void;
+  onToggleEdition: () => void;
+  modeEdition: boolean;
 };
 
-export default function FloatingActions({ onAddCategory, onAddGoal }: Props) {
+export default function FloatingActions({ onAddCategory, onAddGoal, onToggleEdition, modeEdition }: Props) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -84,6 +86,30 @@ export default function FloatingActions({ onAddCategory, onAddGoal }: Props) {
             className="flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-transform hover:scale-110 duration-300"
           >
             <Target size={28} />
+          </button>
+        </div>
+        {/* Bouton  Edition */}
+        <div
+          className={`flex items-center gap-2 transition-all delay-100 ${
+            open ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-6 scale-90 pointer-events-none'
+          } duration-500 ease-out`}
+        >
+          {/* Label */}
+          <span
+            className={`bg-[#2a2a3d] text-white text-sm px-3 py-1 rounded-full shadow-md transition-all ${
+              open ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
+            } duration-500 ease-out`}
+          >
+           {modeEdition ? 'Terminer' : 'Modifier'}
+          </span>
+
+          {/* Bouton */}
+          <button
+            onClick={onToggleEdition}
+            className="flex items-center justify-center w-14 h-14 rounded-full bg-orange-600 hover:bg-orange-700 text-white shadow-lg transition-transform hover:scale-110 duration-300"
+          >
+          {modeEdition ? <X size={24} /> : <Pencil size={24} />}
+
           </button>
         </div>
 

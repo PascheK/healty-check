@@ -8,7 +8,7 @@ export default function LogoutButton() {
 
   const handleLogout = async () => {
     await authService.logout();
-    router.push('/login'); // ou '/connexion' selon tes routes
+    router.push('/'); // ou '/connexion' selon tes routes
   };
 
   return (

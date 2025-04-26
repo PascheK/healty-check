@@ -18,20 +18,22 @@ import AddCategoryModal from '@/components/AddCategoryModal';
 import FloatingActions from '@/components/FloatingActions';
 import AddGoalModal from '@/components/AddGoalModal';
 import { storageService } from '@/services/storageService';
+import { useConfirm } from '@/lib/hooks/useConfirm'; // N'oublie pas !
 
 
 export default function ProfilePage() {
   // 🌟 State
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
- 
+  const [modeEdition, setModeEdition] = useState(false);
+
   // 🌟 Hooks
   const router = useRouter();
   const { showToast } = useToast();
   const { isOpen, isClosing, openModal, closeModal } = useModal();
   const { isOpen: isGoalModalOpen, isClosing: isGoalModalClosing, openModal: openGoalModal, closeModal: closeGoalModal } = useModal();
   const { syncing, queueSync } = useSyncManager();
-  
+  const { confirm, ConfirmationModal } = useConfirm(); 
   // 🌟 Initialisation de la page
   useEffect(() => {
     const initProfile = async () => {
@@ -152,6 +154,14 @@ export default function ProfilePage() {
   const handleDeleteCategory = async (categoryName: string) => {
     if (!user) return;
   
+    const accepted = await confirm({
+      title: 'Supprimer cette catégorie ?',
+      message: `Veux-tu vraiment supprimer "${categoryName}" ?`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+    });
+    
+    if (!accepted) return;
     const updatedUser = {
       ...user,
       categories: user.categories.filter((cat) => cat.name !== categoryName),
@@ -166,7 +176,14 @@ export default function ProfilePage() {
   
   const handleDeleteGoal = async (categoryName: string, goalTitle: string) => {
     if (!user) return;
-  
+    const accepted = await confirm({
+      title: 'Supprimer cette objectif ?',
+      message: `Veux-tu vraiment supprimer "${goalTitle}" ?`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+    });
+    if (!accepted) return;
+
     const updatedUser = {
       ...user,
       categories: user.categories.map((cat) =>
@@ -201,6 +218,8 @@ export default function ProfilePage() {
   }
 
   return (
+    <>
+    <ConfirmationModal />
     <main className="p-6 max-w-md mx-auto relative">
       {syncing && (
   <div className="fixed top-2 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black px-4 py-2 rounded-full shadow-lg z-50 animate-pulse">
@@ -213,12 +232,12 @@ export default function ProfilePage() {
         Salut {user.firstName} {user.lastName}
       </h1>
  
-      <Checklist   categories={user.categories}
+      <Checklist modeEdition  categories={user.categories}
   onToggle={toggleGoal}
   onDeleteCategory={handleDeleteCategory}
   onDeleteGoal={handleDeleteGoal} />
       <LogoutButton />
-      <FloatingActions onAddCategory={openModal} onAddGoal={openGoalModal} />
+      <FloatingActions onAddCategory={openModal} onAddGoal={openGoalModal} onToggleEdition={() => setModeEdition((prev) => !prev)} modeEdition={modeEdition}  />
 
       <AddCategoryModal
         isOpen={isOpen}
@@ -235,5 +254,7 @@ export default function ProfilePage() {
         categories={user?.categories.map((c) => c.name) || []}
       />
     </main>
+    </>
+   
   );
 }

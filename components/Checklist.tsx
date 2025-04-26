@@ -10,6 +10,7 @@ type Props = {
   onToggle: (categoryName: string, goalIndex: number) => void;
   onDeleteCategory: (categoryName: string) => void;
   onDeleteGoal: (categoryName: string, goalTitle: string) => void;
+  modeEdition: boolean;
 };
 
 export default function Checklist({
@@ -17,6 +18,7 @@ export default function Checklist({
   onToggle,
   onDeleteCategory,
   onDeleteGoal,
+  modeEdition,
 }: Props) {
   const [openSections, setOpenSections] = useState<boolean[]>([]);
 
@@ -49,13 +51,15 @@ export default function Checklist({
             </div>
 
             {/* Bouton supprimer catégorie */}
-            <button
-              onClick={() => onDeleteCategory(category.name)}
-              className="text-red-400 hover:text-red-600"
-              title="Supprimer catégorie"
-            >
-              <Trash2 size={18} />
-            </button>
+            {modeEdition && (
+  <button
+    onClick={() => onDeleteCategory(category.name)}
+    className="text-red-400 hover:text-red-600"
+    title="Supprimer catégorie"
+  >
+    <Trash2 size={18} />
+  </button>
+)}
           </div>
 
           {/* Objectifs */}
@@ -92,13 +96,16 @@ export default function Checklist({
                   </div>
 
                   {/* Bouton supprimer objectif */}
-                  <button
-                    onClick={() => onDeleteGoal(category.name, goal.title)}
-                    className="text-red-400 hover:text-red-600"
-                    title="Supprimer objectif"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  {modeEdition && (
+  <button
+    onClick={() => onDeleteGoal(category.name, goal.title)}
+    className="text-red-400 hover:text-red-600"
+    title="Supprimer objectif"
+  >
+    <Trash2 size={16} />
+  </button>
+)}
+
                 </li>
               ))}
             </ul>
