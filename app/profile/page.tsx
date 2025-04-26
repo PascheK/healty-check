@@ -23,14 +23,13 @@ export default function ProfilePage() {
   // 🌟 State
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [loadingSync, setLoadingSync] = useState(false);
-
+ 
   // 🌟 Hooks
   const router = useRouter();
   const { showToast } = useToast();
   const { isOpen, isClosing, openModal, closeModal } = useModal();
   const { isOpen: isGoalModalOpen, isClosing: isGoalModalClosing, openModal: openGoalModal, closeModal: closeGoalModal } = useModal();
-  const { syncing } = useSyncManager();
+  const { syncing, queueSync } = useSyncManager();
   
   // 🌟 Initialisation de la page
   useEffect(() => {
@@ -99,7 +98,8 @@ export default function ProfilePage() {
     localStorage.setItem('userData', JSON.stringify(updatedUser)); // 🔥 sauvegarde local immédiate
     showToast('success', 'Catégorie ajoutée ✅');
   
-    await syncUser(updatedUser);
+    queueSync(updatedUser.code, updatedUser.categories); // ➡️ NOUVEAU : file d'attente
+
   };
 
   const handleAddGoal = async (categoryName: string, goalTitle: string) => {
@@ -130,20 +130,8 @@ export default function ProfilePage() {
     localStorage.setItem('userData', JSON.stringify(updatedUser));
     showToast('success', 'Objectif ajouté 🎯');
 
-    await syncUser(updatedUser);
-  };
+    queueSync(updatedUser.code, updatedUser.categories); // ➡️ Utiliser la file d'attente aussi
 
-  const syncUser = async (updatedUser: UserData) => {
-    try {
-      setLoadingSync(true);
-      await userService.syncCategories(updatedUser.code, updatedUser.categories);
-    } catch (error) {
-      console.error(error);
-      showToast('error', 'Erreur de synchronisation ❌');
-      userService.savePendingSync(updatedUser.code, updatedUser.categories);
-    } finally {
-      setLoadingSync(false);
-    }
   };
 
   const toggleGoal = (categoryName: string, goalIndex: number) => {
@@ -167,11 +155,7 @@ export default function ProfilePage() {
     ⏳ Synchronisation en cours...
   </div>
 )}
-      {loadingSync && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg z-50 animate-pulse">
-          Synchronisation...
-        </div>
-      )}
+ 
 
       <h1 className="text-3xl font-bold text-center mb-6">
         Salut {user.firstName} {user.lastName} 👋

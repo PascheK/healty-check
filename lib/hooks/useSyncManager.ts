@@ -1,39 +1,47 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { userService } from '@/services/userService';
 import { useToast } from '@/lib/hooks/useToast';
+import { Category } from '@/types/user';
 
 export function useSyncManager() {
   const { showToast } = useToast();
   const [syncing, setSyncing] = useState(false);
 
-  useEffect(() => {
-    const trySyncPending = async () => {
-      const pending = userService.getPendingSync();
-      if (pending && navigator.onLine) {
-        try {
-          setSyncing(true); // 🔥 démarrage de la tentative
-          await userService.syncCategories(pending.code, pending.categories);
-          userService.removePendingSync();
-          showToast('success', 'Synchronisation automatique réussie ✅');
-        } catch (error) {
-          console.error('Erreur de synchronisation automatique', error);
-        } finally {
-          setSyncing(false); // 🔥 tentative terminée
-        }
-      }
-    };
+  const trySyncPending = useCallback(async () => {
+    const pending = userService.getPendingSync();
+    if (!pending || !navigator.onLine) return;
 
-    trySyncPending(); // Démarrage immédiat
+    try {
+      setSyncing(true);
+      await userService.syncCategories(pending.code, pending.categories);
+      userService.removePendingSync();
+      showToast('success', '✅ Synchronisation réussie');
+    } catch (error) {
+      console.error('❌ Erreur de synchronisation:', error);
+    } finally {
+      setSyncing(false);
+    }
+  }, [showToast]);
+
+  useEffect(() => {
+    trySyncPending(); // 🔥 Au chargement de la page
+
     window.addEventListener('online', trySyncPending);
-    const retryInterval = setInterval(trySyncPending, 30000); // 30 secondes
+    const interval = setInterval(trySyncPending, 30000); // 🔄 Toutes les 30s
 
     return () => {
       window.removeEventListener('online', trySyncPending);
-      clearInterval(retryInterval);
+      clearInterval(interval);
     };
-  }, [showToast]);
+  }, [trySyncPending]);
 
-  return { syncing };
+  const queueSync = (userCode: string, categories: Category[]) => {
+    userService.savePendingSync(userCode, categories);
+    console.log('📦 Données mises en attente pour sync');
+    trySyncPending(); // 🔥 Tentative immédiate après ajout
+  };
+
+  return { syncing, queueSync };
 }

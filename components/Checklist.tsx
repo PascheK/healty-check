@@ -16,7 +16,7 @@ export default function Checklist({ categories, onToggle }: Props) {
   // 🌟 Initialisation des sections ouvertes
   useEffect(() => {
     setOpenSections(Array(categories.length).fill(true));
-  }, [categories.length]);
+  }, [categories]);
 
   // 🌟 Gestion ouverture/fermeture des sections
   const toggleSection = (index: number) => {
