@@ -86,8 +86,33 @@ export const userService = {
   },
 
   // 🧠 Gestion du pendingSync (localStorage)
-  savePendingSync: (code: string, categories: Category[]) => {
-    localStorage.setItem('pendingSync', JSON.stringify({ code, categories }));
+  savePendingSync: (code: string, newCategories: Category[]) => {
+    const pending = userService.getPendingSync();
+  
+    if (pending && pending.code === code) {
+      // 🔥 Fusionner intelligemment les catégories
+      const mergedCategories: Category[] = [...pending.categories];
+  
+      newCategories.forEach((newCat) => {
+        const existingCat = mergedCategories.find((cat) => cat.name === newCat.name);
+        if (existingCat) {
+          // ➡️ Ajouter uniquement les nouveaux objectifs
+          newCat.goals.forEach((newGoal) => {
+            if (!existingCat.goals.some((g) => g.title === newGoal.title)) {
+              existingCat.goals.push(newGoal);
+            }
+          });
+        } else {
+          // ➡️ Nouvelle catégorie complète
+          mergedCategories.push(newCat);
+        }
+      });
+  
+      localStorage.setItem('pendingSync', JSON.stringify({ code, categories: mergedCategories }));
+    } else {
+      // ➡️ Pas d'existant ➔ sauvegarder tel quel
+      localStorage.setItem('pendingSync', JSON.stringify({ code, categories: newCategories }));
+    }
   },
 
   removePendingSync: () => {
