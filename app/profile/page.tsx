@@ -35,19 +35,31 @@ export default function ProfilePage() {
   // 🌟 Initialisation de la page
   useEffect(() => {
     const initProfile = async () => {
-      if (!await authService.isAuthenticated()) {
+      if (!(await authService.isAuthenticated())) {
         router.push('/login');
         return;
       }
-
+    
+      const pending = await userService.getPendingSync();
+      if (pending) {
+        // 🔥 Si il y a un pendingSync, ne pas écraser ce qu'on a localement
+        const cachedUser = await authService.getUser();
+        if (cachedUser) {
+          setUser(cachedUser);
+          setLoading(false);
+          return;
+        }
+      }
+    
       const data = await authService.fetchCurrentUser();
       if (!data) {
         console.error('Utilisateur introuvable');
       }
-
+    
       setUser(data);
       setLoading(false);
     };
+    
 
     const syncPending = async () => {
       const pending = await  userService.getPendingSync();
