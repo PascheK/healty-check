@@ -95,6 +95,7 @@ export default function ProfilePage() {
     };
  
     setUser(updatedUser); // 🔥 ça met à jour la vue immédiatement
+    console.log('🔵 User après ajout:', updatedUser);
     localStorage.setItem('userData', JSON.stringify(updatedUser)); // 🔥 sauvegarde local immédiate
     showToast('success', 'Catégorie ajoutée ✅');
   
@@ -127,6 +128,7 @@ export default function ProfilePage() {
     };
 
     setUser(updatedUser);
+    console.log('🔵 User après ajout:', updatedUser);
     localStorage.setItem('userData', JSON.stringify(updatedUser));
     showToast('success', 'Objectif ajouté 🎯');
 
