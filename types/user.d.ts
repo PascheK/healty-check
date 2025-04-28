@@ -1,3 +1,5 @@
+import { GiftEntry } from './gift';
+
 export interface Goal {
   title: string;
   checked: boolean;
@@ -14,5 +16,15 @@ export interface UserData {
   lastName: string;
   categories: Category[];
   role?: 'admin' | 'user';
-  subscription?: any; // A modifier 
+
+  pendingGift: GiftEntry; 
+  canRerollToday: boolean;
+
+  subscription?: {
+    endpoint: string;
+    keys: {
+      p256dh: string;
+      auth: string;
+    };
+  }; // 🔥 Typage correct de subscription (WebPush)
 }

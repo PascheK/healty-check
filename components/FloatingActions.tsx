@@ -52,7 +52,7 @@ export default function FloatingActions({ onAddCategory, onAddGoal, onToggleEdit
       } duration-500 ease-out`}
     >
       <span
-        className={`bg-[#2a2a3d] text-white text-sm px-3 py-1 rounded-full shadow-md transition-all ${
+        className={`bg-foreground text-text-primary text-sm px-3 py-1 rounded-full shadow-md transition-all ${
           open ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
         } duration-500 ease-out`}
       >
@@ -64,7 +64,7 @@ export default function FloatingActions({ onAddCategory, onAddGoal, onToggleEdit
           onAddCategory();
           setOpen(false);
         }}
-        className="flex items-center justify-center w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg transition-transform hover:scale-110 duration-300"
+        className="flex items-center justify-center w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 text-text-primary shadow-lg transition-transform hover:scale-110 duration-300"
       >
         <FolderPlus size={28} />
       </button>
@@ -77,7 +77,7 @@ export default function FloatingActions({ onAddCategory, onAddGoal, onToggleEdit
       } duration-500 ease-out`}
     >
       <span
-        className={`bg-[#2a2a3d] text-white text-sm px-3 py-1 rounded-full shadow-md transition-all ${
+        className={`bg-foreground  text-text-primary text-sm px-3 py-1 rounded-full shadow-md transition-all ${
           open ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
         } duration-500 ease-out`}
       >
@@ -89,7 +89,7 @@ export default function FloatingActions({ onAddCategory, onAddGoal, onToggleEdit
           onAddGoal();
           setOpen(false);
         }}
-        className="flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-transform hover:scale-110 duration-300"
+        className="flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-text-primary shadow-lg transition-transform hover:scale-110 duration-300"
       >
         <Target size={28} />
       </button>
@@ -102,7 +102,7 @@ export default function FloatingActions({ onAddCategory, onAddGoal, onToggleEdit
       } duration-500 ease-out`}
     >
       <span
-        className={`bg-[#2a2a3d] text-white text-sm px-3 py-1 rounded-full shadow-md transition-all ${
+        className={`bg-foreground text-text-primary text-sm px-3 py-1 rounded-full shadow-md transition-all ${
           open ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
         } duration-500 ease-out`}
       >
@@ -114,7 +114,7 @@ export default function FloatingActions({ onAddCategory, onAddGoal, onToggleEdit
           onToggleEdition();
           setOpen(false);
         }}
-        className="flex items-center justify-center w-14 h-14 rounded-full bg-orange-600 hover:bg-orange-700 text-white shadow-lg transition-transform hover:scale-110 duration-300"
+        className="flex items-center justify-center w-14 h-14 rounded-full bg-orange-600 hover:bg-orange-700 text-text-primary shadow-lg transition-transform hover:scale-110 duration-300"
       >
         {modeEdition ? <X size={24} /> : <Pencil size={24} />}
       </button>
@@ -127,7 +127,7 @@ export default function FloatingActions({ onAddCategory, onAddGoal, onToggleEdit
       } duration-500 ease-out`}
     >
       <span
-        className={`bg-[#2a2a3d] text-white text-sm px-3 py-1 rounded-full shadow-md transition-all ${
+        className={`bg-foreground text-text-primary text-sm px-3 py-1 rounded-full shadow-md transition-all ${
           open ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
         } duration-500 ease-out`}
       >
@@ -139,7 +139,7 @@ export default function FloatingActions({ onAddCategory, onAddGoal, onToggleEdit
           onLogout(); // ➡️ Appel à une fonction `onLogout` que tu passes au composant
           setOpen(false);
         }}
-        className="flex items-center justify-center w-14 h-14 rounded-full bg-red-600 hover:bg-red-700 text-white shadow-lg transition-transform hover:scale-110 duration-300"
+        className="flex items-center justify-center w-14 h-14 rounded-full bg-red-600 hover:bg-red-700 text-text-primary shadow-lg transition-transform hover:scale-110 duration-300"
       >
         <LogOut size={24} />
       </button>
@@ -148,7 +148,7 @@ export default function FloatingActions({ onAddCategory, onAddGoal, onToggleEdit
     {/* Bouton principal ➕ */}
     <button
       onClick={() => setOpen(!open)}
-      className={`flex items-center justify-center w-16 h-16 rounded-full bg-purple-600 hover:bg-purple-700 text-white shadow-2xl transition-transform duration-500 ease-in-out ${
+      className={`flex items-center justify-center w-16 h-16 rounded-full bg-purple-600 hover:bg-purple-700 text-text-primary shadow-2xl transition-transform duration-500 ease-in-out ${
         open ? 'rotate-45 scale-110' : 'rotate-0 scale-100'
       } hover:rotate-90`}
     >

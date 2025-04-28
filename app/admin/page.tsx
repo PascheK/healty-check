@@ -67,38 +67,41 @@ export default function AdminPage() {
 
   // 🌟 Affichage principal
   return (
-    <main className="min-h-screen bg-[#1e1e2e] text-white p-4 flex flex-col gap-6">
+    <main className="min-h-screen bg-background text-text-primary p-4 flex flex-col gap-6">
       <header className="text-center">
         <h1 className="text-3xl font-bold mb-2">Panneau Admin 🛠️</h1>
         <p className="text-gray-400 text-sm">Gère les utilisateurs et les bons</p>
       </header>
 
       {message && (
-        <div className="bg-[#2a2a3d] text-center text-green-400 py-2 px-4 rounded-md">
+        <div className="bg-foreground text-center text-green-400 py-2 px-4 rounded-md">
           {message}
         </div>
       )}
 
-      <section className="flex flex-col sm:flex-row gap-4 justify-center">
+      <section className="flex flex-col sm:flex-row gap-4 justify-center ">
+        <div className="flex flex-col gap-4 text-center">
         <button
           onClick={openAddModal}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+          className="bg-blue-500 text-text-primary px-4 py-2 rounded-lg hover:bg-blue-600"
         >
           ➕ Ajouter un utilisateur
         </button>
 
         <button
           onClick={openListModal}
-          className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
+          className="bg-gray-600 text-text-primary px-4 py-2 rounded-lg hover:bg-gray-700"
         >
           👥 Voir les utilisateurs
         </button>
         <button
   onClick={openNotifModal}
-  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+  className="bg-purple-600 text-text-primary px-4 py-2 rounded-lg hover:bg-purple-700"
 >
   📣 Envoyer une notification
 </button>
+        </div>
+        
         
               </section>
 

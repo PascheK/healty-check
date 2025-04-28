@@ -32,7 +32,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 <meta name="apple-mobile-web-app-title" content="Healty Check" />
       </head>
       <ServiceWorkerProvider /> 
-      <body className="bg-gray-900 text-gray-100">
+      <body className="bg-background text-text-primary min-h-screen border-border">
       <ToastProvider>
 
         {children}

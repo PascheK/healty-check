@@ -34,8 +34,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           ease-in-out
           ${
             toast.type === 'success'
-              ? 'bg-green-600 text-white'
-              : 'bg-red-600 text-white'
+              ? 'bg-green-600 text-text-primary'
+              : 'bg-red-600 text-text-primary'
           }`}
         >
           {toast.message}

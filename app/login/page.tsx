@@ -62,16 +62,16 @@ export default function LoginPage() {
   // 🌟 Affichage loading pendant check
   if (checkingAuth) {
     return (
-      <main className="min-h-screen bg-[#1e1e2e] flex items-center justify-center">
-        <p className="text-white text-center">Chargement...</p>
+      <main className="min-h-screen  flex items-center justify-center">
+        <p className="text-center">Chargement...</p>
       </main>
     );
   }
 
   // 🌟 Formulaire
   return (
-    <main className="min-h-screen bg-[#1e1e2e] text-white flex items-center justify-center p-6">
-      <div className="bg-[#2a2a3d] rounded-xl shadow-xl p-6 max-w-sm w-full">
+    <main className="min-h-screen flex items-center justify-center p-6">
+      <div className="rounded-xl shadow-xl p-6 max-w-sm w-full bg-foreground">
         <h1 className="text-2xl font-bold mb-4 text-center">Connexion 💙</h1>
 
         <input
@@ -79,13 +79,13 @@ export default function LoginPage() {
           value={code}
           onChange={(e) => setCode(e.target.value)}
           placeholder="Code personnel"
-          className="w-full px-4 py-2 bg-[#1e1e2e] border border-gray-500 text-white rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full px-4 py-2 bg-background text-text-secondary border border-border rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <button
           onClick={handleLogin}
           disabled={loading || !code}
-          className="w-full bg-blue-500 text-white font-semibold py-2 rounded hover:bg-blue-600 transition"
+          className="w-full bg-blue-500 text-text-primary font-semibold py-2 rounded hover:bg-blue-600 transition"
         >
           {loading ? 'Connexion...' : 'Se connecter'}
         </button>

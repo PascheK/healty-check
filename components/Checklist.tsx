@@ -40,7 +40,7 @@ export default function Checklist({
           className="rounded border border-gray-700 shadow-sm bg-gray-800 text-gray-100"
         >
           {/* Header */}
-          <div className="flex justify-between items-center px-4 py-3 bg-gray-700 rounded-t cursor-pointer">
+          <div className="flex justify-between items-center px-4 py-3 bg-primary-dark rounded-t cursor-pointer">
             <div className="flex items-center gap-2" onClick={() => toggleSection(categoryIndex)}>
               {openSections[categoryIndex] ? (
                 <ChevronDown size={18} />
@@ -64,7 +64,7 @@ export default function Checklist({
 
           {/* Objectifs */}
           <div
-            className={`transition-all duration-300 ease-in-out overflow-hidden ${
+            className={`transition-all duration-300 ease-in-out  overflow-hidden ${
               openSections[categoryIndex]
                 ? 'max-h-[999px] opacity-100'
                 : 'max-h-0 opacity-0'

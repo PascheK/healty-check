@@ -19,13 +19,13 @@ export default function ModalWrapper({ isOpen, isClosing, onClose, children }: M
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative bg-[#2a2a3d] text-white rounded-xl p-6 w-full max-w-sm shadow-lg ${
+        className={`relative bg-foreground text-text-primary rounded-xl p-6 w-full max-w-sm shadow-lg ${
           isClosing ? 'animate-fade-zoom-out' : 'animate-fade-zoom-in'
         }`}
       >
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-white text-xl hover:text-red-400 transition"
+          className="absolute top-3 right-3 text-text-primary text-xl hover:text-red-400 transition"
         >
           ✖
         </button>

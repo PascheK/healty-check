@@ -62,7 +62,7 @@ export default function SendNotificationModal({ isOpen, isClosing, onClose }: Pr
         <select
           value={selectedUserCode}
           onChange={(e) => setSelectedUserCode(e.target.value)}
-          className="p-2 rounded bg-gray-800 text-white border border-gray-600"
+          className="p-2 rounded bg-foreground text-text-primary border border-border"
         >
           <option value="">-- Sélectionner un utilisateur --</option>
           {users.map((user) => (
@@ -78,14 +78,14 @@ export default function SendNotificationModal({ isOpen, isClosing, onClose }: Pr
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Ton message ici..."
           rows={4}
-          className="p-2 rounded bg-gray-800 text-white border border-gray-600 resize-none"
+          className="p-2 rounded bg-foreground text-text-primary border border-border resize-none"
         />
 
         {/* Envoyer */}
         <button
           onClick={handleSend}
           disabled={loading}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition"
+          className="bg-blue-500 hover:bg-blue-600 text-text-primary font-semibold py-2 px-4 rounded transition"
         >
           {loading ? 'Envoi...' : 'Envoyer'}
         </button>

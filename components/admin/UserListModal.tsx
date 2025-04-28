@@ -70,7 +70,7 @@ export default function UserListModal({ isOpen, isClosing, onClose }: Props) {
         {toast && (
           <div
             className={`mb-4 px-4 py-2 rounded text-sm transition duration-300 ease-in-out ${
-              toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+              toast.type === 'success' ? 'bg-green-600 text-text-primary' : 'bg-red-600 text-text-primary'
             } animate-fade-zoom-in`}
           >
             {toast.message}
@@ -78,20 +78,20 @@ export default function UserListModal({ isOpen, isClosing, onClose }: Props) {
         )}
 
         {loading ? (
-          <p className="text-gray-300 text-sm">Chargement...</p>
+          <p className="text-text-primary text-sm">Chargement...</p>
         ) : (
           <ul className="max-h-80 overflow-y-auto space-y-2 text-sm">
             {users.length > 0 ? (
               users.map((user) => (
                 <li
                   key={user.code}
-                  className="flex justify-between items-center p-3 border border-gray-600 rounded bg-[#1e1e2e]"
+                  className="flex justify-between items-center p-3 border border-border rounded bg-foreground"
                 >
                   {/* Infos utilisateur */}
                   <div className="flex flex-col">
                     <span className="font-medium">{user.firstName}</span>
-                    <span className="text-gray-400 text-xs">Code : {user.code}</span>
-                    <span className="text-gray-400 text-xs">Rôle : {user.role}</span>
+                    <span className="text-text-secondary text-xs">Code : {user.code}</span>
+                    <span className="text-text-secondary text-xs">Rôle : {user.role}</span>
                   </div>
 
                   {/* Action de suppression */}
@@ -105,7 +105,7 @@ export default function UserListModal({ isOpen, isClosing, onClose }: Props) {
                 </li>
               ))
             ) : (
-              <p className="text-gray-400 text-center">Aucun utilisateur trouvé.</p>
+              <p className="text-text-secondary text-center">Aucun utilisateur trouvé.</p>
             )}
           </ul>
         )}

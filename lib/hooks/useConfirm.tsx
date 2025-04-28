@@ -36,23 +36,23 @@ export function useConfirm() {
 
     return (
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-        <div className="bg-[#2a2a3d] text-white rounded-xl p-6 w-full max-w-sm shadow-lg animate-fade-zoom-in">
+        <div className="bg-foreground text-text-primary rounded-xl p-6 w-full max-w-sm shadow-lg animate-fade-zoom-in">
           <h2 className="text-xl font-bold mb-4 text-center">
             {options.title || 'Confirmation'}
           </h2>
-          <p className="text-gray-300 text-center mb-6">
+          <p className="text-text-secondary text-center mb-6">
             {options.message || 'Es-tu sûr de vouloir effectuer cette action ?'}
           </p>
           <div className="flex justify-center gap-4">
             <button
               onClick={onCancel}
-              className="px-4 py-2 border border-gray-500 rounded hover:bg-gray-700"
+              className="px-4 py-2 border border-border rounded hover:bg-gray-700"
             >
               {options.cancelText || 'Annuler'}
             </button>
             <button
               onClick={onConfirm}
-              className="bg-red-600 px-4 py-2 text-white font-semibold rounded hover:bg-red-700"
+              className="bg-red-600 px-4 py-2 text-text-primary font-semibold rounded hover:bg-red-700"
             >
               {options.confirmText || 'Confirmer'}
             </button>

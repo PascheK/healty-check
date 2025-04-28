@@ -35,7 +35,7 @@ export default function HomePage() {
         {/* ⚙️ Bouton flottant options */}
         <button
         onClick={() => setShowOptions(true)}
-        className="fixed bottom-6 right-6 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg z-50"
+        className="fixed bottom-6 right-6 bg-blue-500 hover:bg-blue-600 text-text-primary px-4 py-2 rounded-full shadow-lg z-50"
       >
         ⚙️
       </button>
@@ -57,7 +57,7 @@ export default function HomePage() {
 
       <button
         onClick={() => login()}
-        className="bg-blue-500 text-white px-6 py-2 rounded shadow"
+        className="bg-blue-500 text-text-primary px-6 py-2 rounded shadow"
       >
         Accéder à mon espace
       </button>

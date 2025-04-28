@@ -1,4 +1,6 @@
 import { UserData, Category } from '@/types/user';
+import { GiftWallet } from '@/types/gift'; 
+
 import { storageService } from './storageService';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -133,4 +135,74 @@ export const userService = {
     const allUsers = await userService.getAll();
     return allUsers.filter((u) => u.subscription); // Filtre uniquement ceux qui ont subscription
   },
+  // 🎁 Récupérer le portefeuille de bons (depuis le backend)
+fetchGiftWallet: async (userId: string): Promise<GiftWallet> => {
+  const res = await fetch(`${API_URL}/api/gifts/wallet?userId=${userId}`);
+  if (!res.ok) throw new Error('Erreur lors du chargement du portefeuille de bons');
+  return res.json();
+},
+
+// 🎁 Stocker localement le portefeuille
+saveGiftWalletLocal: async (wallet: GiftWallet) => {
+  await storageService.setItem('giftWallet', wallet);
+},
+
+// 🎁 Charger le portefeuille depuis local
+getGiftWalletLocal: async (): Promise<GiftWallet | null> => {
+  const local = await storageService.getItem('giftWallet');
+  return local ? (local as GiftWallet) : null;
+},
+
+// 🎁 Synchroniser les bons avec serveur (forcément online)
+syncGiftWallet: async (userId: string) => {
+  try {
+    const wallet = await userService.fetchGiftWallet(userId);
+    await userService.saveGiftWalletLocal(wallet);
+    console.log('✅ Synchronisation des bons terminée');
+    return wallet;
+  } catch (err) {
+    console.error('❌ Erreur lors de la synchronisation des bons :', err);
+    throw err;
+  }
+},
+
+// 🎯 Utiliser un bon
+useGift: async (userId: string, giftEntryId: string) => {
+  const res = await fetch(`${API_URL}/api/gifts/use`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, giftEntryId }),
+  });
+
+  if (!res.ok) throw new Error('Erreur lors de l\'utilisation du bon');
+
+  // Après utilisation, resynchroniser le portefeuille
+  await userService.syncGiftWallet(userId);
+},
+
+// 🎲 Reroll un bon
+rerollGift: async (userId: string) => {
+  const res = await fetch(`${API_URL}/api/gifts/reroll`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId }),
+  });
+
+  if (!res.ok) throw new Error('Erreur lors du reroll');
+
+  // Après reroll, resynchroniser le portefeuille
+  await userService.syncGiftWallet(userId);
+},
+acceptGift: async (userId: string) => {
+  const res = await fetch(`${API_URL}/api/gifts/accept`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId }),
+  });
+
+  if (!res.ok) throw new Error('Erreur lors de l\'acceptation du bon');
+},
+
+
+
 };

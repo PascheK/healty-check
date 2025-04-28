@@ -18,7 +18,9 @@ import AddCategoryModal from '@/components/AddCategoryModal';
 import FloatingActions from '@/components/FloatingActions';
 import AddGoalModal from '@/components/AddGoalModal';
 import { storageService } from '@/services/storageService';
-import { useConfirm } from '@/lib/hooks/useConfirm'; // N'oublie pas !
+import { useConfirm } from '@/lib/hooks/useConfirm'; 
+import GiftWallet from '@/components/GiftWallet';
+import DailyGift from '@/components/DailyGift';
 
 
 export default function ProfilePage() {
@@ -26,6 +28,8 @@ export default function ProfilePage() {
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [modeEdition, setModeEdition] = useState(false);
+  const [refreshFlag, setRefreshFlag] = useState(0);
+
 
   // 🌟 Hooks
   const router = useRouter();
@@ -211,11 +215,14 @@ export default function ProfilePage() {
     await authService.logout();
     router.push('/'); // ou '/connexion' selon tes routes
   };
+  const handleGiftAccepted = async () => {
 
+    setRefreshFlag((prev) => prev + 1); // ➡️ Déclenche un refresh
+  };
 
   // 🌟 Affichage
   if (loading) {
-    return <p className="text-center p-6 text-white">Chargement...</p>;
+    return <p className="text-center p-6 text-text-primary">Chargement...</p>;
   }
 
   if (!user) {
@@ -225,7 +232,7 @@ export default function ProfilePage() {
   return (
     <>
     <ConfirmationModal />
-    <main className="p-6 max-w-md mx-auto relative">
+    <main className="p-6 max-w-md mx-auto relative min-h-screen">
       {syncing && (
   <div className="fixed top-2 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black px-4 py-2 rounded-full shadow-lg z-50 animate-pulse">
     ⏳ Synchronisation en cours...
@@ -233,18 +240,23 @@ export default function ProfilePage() {
 )}
  
 
-      <h1 className="text-3xl font-bold text-center mb-6">
+      <h1 className="text-3xl font-bold text-center mb-6 ">
         Salut {user.firstName} {user.lastName}
       </h1>
- 
+      <div className='flex flex-col  w-auto gap-8 min-h-screen'>
+      <DailyGift userId={user.code} onGiftAccepted={handleGiftAccepted} />
+      
+
       <Checklist 
         modeEdition={modeEdition}
       categories={user.categories}
   onToggle={toggleGoal}
   onDeleteCategory={handleDeleteCategory}
-  onDeleteGoal={handleDeleteGoal} />
+      onDeleteGoal={handleDeleteGoal} />
       <FloatingActions onAddCategory={openModal} onAddGoal={openGoalModal} onToggleEdition={() => setModeEdition((prev) => !prev)} modeEdition={modeEdition} onLogout={handleLogout}/>
-
+      <GiftWallet userId={user.code} key={refreshFlag}/> 
+      </div>
+      
       <AddCategoryModal
         isOpen={isOpen}
         isClosing={isClosing}
