@@ -35,7 +35,7 @@ export function useConfirm() {
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 px-4 z-index-500">
+      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 px-4 z-500">
         <div className="bg-foreground text-text-primary rounded-xl p-6 w-full max-w-sm shadow-lg animate-fade-zoom-in">
           <h2 className="text-xl font-bold mb-4 text-center">
             {options.title || 'Confirmation'}
