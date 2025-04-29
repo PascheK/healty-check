@@ -4,10 +4,11 @@ import { UserData } from '@/types/user';
 import { notificationService } from '@/services/notificationService';
 import { storageService } from './storageService';
 
+// 🔵 URL de l'API
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const authService = {
-  // 🧠 Login utilisateur
+  // 🧠 Connexion utilisateur
   login: async (code: string): Promise<UserData> => {
     const res = await fetch(`${API_URL}/api/users/login`, {
       method: 'POST',
@@ -21,11 +22,10 @@ export const authService = {
 
     const user = await res.json();
     await storageService.setItem('userCode', user.code);
-    await storageService.setItem('userData', user); // ⬅️ Pas besoin de stringify
+    await storageService.setItem('userData', user);
 
-    // 🔁 Fusion avec un compte anonyme s’il existe
+    // 🔁 Tentative de fusion avec un compte anonyme existant
     const anonId = await storageService.getItem('userId');
-
     if (anonId && anonId.startsWith('anon-') && anonId !== user.code) {
       try {
         await fetch(`${API_URL}/api/notifications/merge`, {
@@ -47,32 +47,32 @@ export const authService = {
     return user;
   },
 
-  // 🧠 Logout utilisateur
+  // 🧠 Déconnexion utilisateur
   logout: async () => {
     await storageService.removeItem('userCode');
     await storageService.removeItem('userData');
     await storageService.removeItem('token');
   },
 
-  // 🧠 Vérifie si utilisateur connecté
+  // 🧠 Vérifie si l'utilisateur est connecté
   isAuthenticated: async (): Promise<boolean> => {
     const code = await storageService.getItem('userCode');
     return !!code;
   },
 
-  // 🧠 Vérifie si utilisateur est admin
+  // 🧠 Vérifie si l'utilisateur est un administrateur
   isAdmin: async (): Promise<boolean> => {
     const user = await authService.getUser();
     return user?.role === 'admin';
   },
 
-  // 🧠 Récupérer l'utilisateur du storage
+  // 🧠 Récupère l'utilisateur depuis le storage local
   getUser: async (): Promise<UserData | null> => {
     const user = await storageService.getItem<UserData>('userData');
     return user ?? null;
   },
 
-  // 🧠 Charger l'utilisateur depuis l'API
+  // 🧠 Récupère l'utilisateur depuis l'API serveur
   fetchCurrentUser: async (): Promise<UserData | null> => {
     const code = await storageService.getItem('userCode');
     if (!code) return null;
@@ -89,14 +89,11 @@ export const authService = {
     } catch (error) {
       console.error('❌ Erreur serveur, tentative de récupération cache');
       const cachedUser = await authService.getUser();
-      if (cachedUser) {
-        return cachedUser;
-      }
-      return null;
+      return cachedUser ?? null;
     }
   },
 
-  // 🧠 Créer un utilisateur anonyme
+  // 🧠 Crée un utilisateur anonyme (ex: avant inscription)
   createAnonymousUser: async (): Promise<string> => {
     let anonId = await storageService.getItem('userId');
 
@@ -111,10 +108,10 @@ export const authService = {
       });
     }
 
-    // ➡️ Ensuite, tentative inscription aux notifications
+    // ➡️ S'abonner aux notifications push
     try {
       await notificationService.subscribeToPushNotifications(anonId);
-      console.log('✅ Abonnement push lié à l\'utilisateur anonyme');
+      console.log('✅ Abonnement push lié à l’utilisateur anonyme');
     } catch (error) {
       console.error('❌ Erreur abonnement push anonyme:', error);
     }

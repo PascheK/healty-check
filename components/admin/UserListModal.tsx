@@ -13,16 +13,20 @@ type Props = {
 };
 
 export default function UserListModal({ isOpen, isClosing, onClose }: Props) {
-  const [users, setUsers] = useState<UserData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const { confirm, ConfirmationModal } = useConfirm();
+  // 🔵 États locaux
+  const [users, setUsers] = useState<UserData[]>([]); // Liste des utilisateurs
+  const [loading, setLoading] = useState(true); // Statut de chargement
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null); // Message de feedback
 
+  const { confirm, ConfirmationModal } = useConfirm(); // Hook pour les confirmations
+
+  // 🔵 Affiche un toast temporaire
   const showToast = (type: 'success' | 'error', message: string) => {
     setToast({ type, message });
     setTimeout(() => setToast(null), 3000);
   };
 
+  // 🔵 Charge tous les utilisateurs
   const loadUsers = async () => {
     setLoading(true);
     try {
@@ -36,6 +40,7 @@ export default function UserListModal({ isOpen, isClosing, onClose }: Props) {
     }
   };
 
+  // 🔵 Gère la suppression d'un utilisateur après confirmation
   const handleDelete = async (code: string) => {
     const accepted = await confirm({
       title: 'Confirmer la suppression',
@@ -48,7 +53,7 @@ export default function UserListModal({ isOpen, isClosing, onClose }: Props) {
 
     try {
       await userService.deleteUser(code);
-      setUsers((prev) => prev.filter((u) => u.code !== code));
+      setUsers((prev) => prev.filter((u) => u.code !== code)); // Mettre à jour localement la liste
       showToast('success', 'Utilisateur supprimé ✅');
     } catch (err) {
       console.error('Erreur suppression utilisateur', err);
@@ -56,17 +61,21 @@ export default function UserListModal({ isOpen, isClosing, onClose }: Props) {
     }
   };
 
+  // 🔵 Charger les utilisateurs à l'ouverture du modal
   useEffect(() => {
     if (isOpen) {
       loadUsers();
     }
   }, [isOpen]);
 
+  // 🔵 Rendu
   return (
     <>
       <ModalWrapper isOpen={isOpen} isClosing={isClosing} onClose={onClose}>
+        {/* Titre */}
         <h2 className="text-xl font-bold mb-4">👥 Utilisateurs</h2>
 
+        {/* Toast de feedback */}
         {toast && (
           <div
             className={`mb-4 px-4 py-2 rounded text-sm transition duration-300 ease-in-out ${
@@ -77,6 +86,7 @@ export default function UserListModal({ isOpen, isClosing, onClose }: Props) {
           </div>
         )}
 
+        {/* Chargement ou liste des utilisateurs */}
         {loading ? (
           <p className="text-text-primary text-sm">Chargement...</p>
         ) : (
@@ -94,7 +104,7 @@ export default function UserListModal({ isOpen, isClosing, onClose }: Props) {
                     <span className="text-text-secondary text-xs">Rôle : {user.role}</span>
                   </div>
 
-                  {/* Action de suppression */}
+                  {/* Bouton de suppression */}
                   <button
                     onClick={() => handleDelete(user.code)}
                     className="text-red-400 hover:text-red-600 text-xl"
@@ -111,6 +121,7 @@ export default function UserListModal({ isOpen, isClosing, onClose }: Props) {
         )}
       </ModalWrapper>
 
+      {/* Modal de confirmation global */}
       <ConfirmationModal />
     </>
   );

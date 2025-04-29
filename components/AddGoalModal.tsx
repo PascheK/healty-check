@@ -12,22 +12,28 @@ type Props = {
 };
 
 export default function AddGoalModal({ isOpen, isClosing, onClose, onAddGoal, categories }: Props) {
+  // 🔵 États locaux
   const [selectedCategory, setSelectedCategory] = useState('');
   const [goalName, setGoalName] = useState('');
 
+  // 🔵 Gestion de la soumission
   const handleSubmit = () => {
-    if (!selectedCategory || goalName.trim() === '') return;
+    if (!selectedCategory || goalName.trim() === '') return; // Vérifie que tous les champs sont remplis
     onAddGoal(selectedCategory, goalName.trim());
+
+    // Réinitialise les champs après ajout
     setSelectedCategory('');
     setGoalName('');
     onClose();
   };
 
+  // 🔵 Rendu
   return (
     <ModalWrapper isOpen={isOpen} isClosing={isClosing} onClose={onClose}>
+      {/* Titre */}
       <h2 className="text-xl font-bold mb-4 text-center">Nouvel objectif</h2>
 
-      {/* Sélection catégorie */}
+      {/* Sélection de la catégorie */}
       <select
         value={selectedCategory}
         onChange={(e) => setSelectedCategory(e.target.value)}
@@ -41,7 +47,7 @@ export default function AddGoalModal({ isOpen, isClosing, onClose, onAddGoal, ca
         ))}
       </select>
 
-      {/* Nom objectif */}
+      {/* Champ de saisie du nom de l'objectif */}
       <input
         type="text"
         placeholder="Nom de l'objectif"
@@ -50,6 +56,7 @@ export default function AddGoalModal({ isOpen, isClosing, onClose, onAddGoal, ca
         className="w-full mb-6 px-4 py-2 bg-foreground border border-border text-text-primary rounded focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
       />
 
+      {/* Boutons d'action */}
       <div className="flex justify-end gap-2">
         <button
           onClick={onClose}

@@ -6,16 +6,16 @@ import { useRouter } from 'next/navigation';
 import { authService } from '@/services/authService';
 
 export default function LoginPage() {
-  // 🌟 State
-  const [code, setCode] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true);
+  // 🔵 États locaux
+  const [code, setCode] = useState(''); // Code saisi par l'utilisateur
+  const [error, setError] = useState(''); // Message d'erreur éventuel
+  const [loading, setLoading] = useState(false); // Indicateur de chargement pour le bouton
+  const [checkingAuth, setCheckingAuth] = useState(true); // Indicateur pour vérifier si utilisateur déjà connecté
 
-  // 🌟 Hooks
+  // 🔵 Hook de navigation
   const router = useRouter();
 
-  // 🌟 Vérifier si déjà connecté
+  // 🔵 Vérifie si l'utilisateur est déjà connecté au chargement
   useEffect(() => {
     const checkAuth = async () => {
       const isAuth = await authService.isAuthenticated();
@@ -27,20 +27,20 @@ export default function LoginPage() {
           router.replace('/profile');
         }
       } else {
-        setCheckingAuth(false);
+        setCheckingAuth(false); // Plus besoin de spinner
       }
     };
 
     checkAuth();
   }, [router]);
 
-  // 🌟 Gestion du login
+  // 🔵 Gestion de la tentative de connexion
   const handleLogin = async () => {
     setLoading(true);
     setError('');
 
     try {
-      await authService.login(code);
+      await authService.login(code); // Tentative de login avec le code fourni
 
       const isAdmin = await authService.isAdmin();
       if (isAdmin) {
@@ -49,6 +49,7 @@ export default function LoginPage() {
         router.push('/profile');
       }
     } catch (err) {
+      // Gestion propre des erreurs
       if (err instanceof Error) {
         setError(err.message || 'Une erreur est survenue');
       } else {
@@ -59,16 +60,16 @@ export default function LoginPage() {
     }
   };
 
-  // 🌟 Affichage loading pendant check
+  // 🔵 Affiche un écran de chargement pendant la vérification d'authentification
   if (checkingAuth) {
     return (
-      <main className="min-h-screen  flex items-center justify-center">
+      <main className="min-h-screen flex items-center justify-center">
         <p className="text-center">Chargement...</p>
       </main>
     );
   }
 
-  // 🌟 Formulaire
+  // 🔵 Formulaire de connexion
   return (
     <main className="min-h-screen flex items-center justify-center p-6">
       <div className="rounded-xl shadow-xl p-6 max-w-sm w-full bg-foreground">
@@ -90,6 +91,7 @@ export default function LoginPage() {
           {loading ? 'Connexion...' : 'Se connecter'}
         </button>
 
+        {/* Message d'erreur éventuel */}
         {error && <p className="text-red-400 text-center mt-3">{error}</p>}
       </div>
     </main>

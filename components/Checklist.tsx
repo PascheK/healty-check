@@ -1,6 +1,5 @@
 'use client';
 
-
 import { useState, useEffect } from 'react';
 import { Trash2, ChevronDown, ChevronRight } from 'lucide-react';
 import { Category } from '@/types/user';
@@ -20,18 +19,22 @@ export default function Checklist({
   onDeleteGoal,
   modeEdition,
 }: Props) {
+  // 🔵 État local : quelles sections sont ouvertes
   const [openSections, setOpenSections] = useState<boolean[]>([]);
 
+  // 🔵 Synchronise l'état des sections ouvertes avec la liste des catégories
   useEffect(() => {
-    setOpenSections(Array(categories.length).fill(true));
+    setOpenSections(Array(categories.length).fill(true)); // Par défaut : tout ouvert
   }, [categories.length]);
 
+  // 🔵 Fonction pour ouvrir/fermer une section spécifique
   const toggleSection = (index: number) => {
     setOpenSections((prev) =>
       prev.map((open, i) => (i === index ? !open : open))
     );
   };
 
+  // 🔵 Rendu
   return (
     <div className="space-y-4">
       {categories.map((category, categoryIndex) => (
@@ -39,7 +42,7 @@ export default function Checklist({
           key={category.name}
           className="rounded border border-gray-700 shadow-sm bg-gray-800 text-gray-100"
         >
-          {/* Header */}
+          {/* En-tête de catégorie */}
           <div className="flex justify-between items-center px-4 py-3 bg-primary-dark rounded-t cursor-pointer">
             <div className="flex items-center gap-2" onClick={() => toggleSection(categoryIndex)}>
               {openSections[categoryIndex] ? (
@@ -50,21 +53,21 @@ export default function Checklist({
               <h2 className="text-md font-semibold">{category.name}</h2>
             </div>
 
-            {/* Bouton supprimer catégorie */}
+            {/* Bouton de suppression de catégorie */}
             {modeEdition && (
-  <button
-    onClick={() => onDeleteCategory(category.name)}
-    className="text-red-400 hover:text-red-600 transition-transform duration-300 hover:animate-shake  "
-    title="Supprimer catégorie"
-  >
-    <Trash2 size={18} />
-  </button>
-)}
+              <button
+                onClick={() => onDeleteCategory(category.name)}
+                className="text-red-400 hover:text-red-600 transition-transform duration-300 hover:animate-shake"
+                title="Supprimer catégorie"
+              >
+                <Trash2 size={18} />
+              </button>
+            )}
           </div>
 
-          {/* Objectifs */}
+          {/* Liste des objectifs */}
           <div
-            className={`transition-all duration-300 ease-in-out  overflow-hidden ${
+            className={`transition-all duration-300 ease-in-out overflow-hidden ${
               openSections[categoryIndex]
                 ? 'max-h-[999px] opacity-100'
                 : 'max-h-0 opacity-0'
@@ -76,6 +79,7 @@ export default function Checklist({
                   key={goal.title}
                   className="flex items-center justify-between gap-2 px-2 py-1 rounded hover:bg-gray-700"
                 >
+                  {/* Objectif */}
                   <div
                     className="flex items-center gap-2 cursor-pointer w-full"
                     onClick={() => onToggle(category.name, goalIndex)}
@@ -95,17 +99,16 @@ export default function Checklist({
                     </span>
                   </div>
 
-                  {/* Bouton supprimer objectif */}
+                  {/* Bouton de suppression d'objectif */}
                   {modeEdition && (
-  <button
-    onClick={() => onDeleteGoal(category.name, goal.title)}
-    className="text-red-400 hover:text-red-600 transition-transform duration-300 hover:animate-shake "
-    title="Supprimer objectif"
-  >
-    <Trash2 size={16} />
-  </button>
-)}
-
+                    <button
+                      onClick={() => onDeleteGoal(category.name, goal.title)}
+                      className="text-red-400 hover:text-red-600 transition-transform duration-300 hover:animate-shake"
+                      title="Supprimer objectif"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>

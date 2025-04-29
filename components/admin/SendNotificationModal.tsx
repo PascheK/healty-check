@@ -13,12 +13,14 @@ type Props = {
 };
 
 export default function SendNotificationModal({ isOpen, isClosing, onClose }: Props) {
-  const [users, setUsers] = useState<UserData[]>([]);
-  const [selectedUserCode, setSelectedUserCode] = useState('');
-  const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  // 🔵 États locaux
+  const [users, setUsers] = useState<UserData[]>([]); // Liste des utilisateurs
+  const [selectedUserCode, setSelectedUserCode] = useState(''); // Code utilisateur sélectionné
+  const [message, setMessage] = useState(''); // Message de la notification
+  const [loading, setLoading] = useState(false); // Indicateur d'envoi en cours
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null); // Message de feedback
 
+  // 🔵 Chargement des utilisateurs lorsque le modal s'ouvre
   useEffect(() => {
     if (isOpen) {
       userService.getAll()
@@ -27,6 +29,7 @@ export default function SendNotificationModal({ isOpen, isClosing, onClose }: Pr
     }
   }, [isOpen]);
 
+  // 🔵 Fonction d'envoi de la notification
   const handleSend = async () => {
     if (!selectedUserCode || !message.trim()) {
       setToast({ type: 'error', message: 'Utilisateur et message obligatoires' });
@@ -43,14 +46,17 @@ export default function SendNotificationModal({ isOpen, isClosing, onClose }: Pr
       setToast({ type: 'error', message: 'Erreur envoi notification ❌' });
     } finally {
       setLoading(false);
-      setTimeout(() => setToast(null), 3000);
+      setTimeout(() => setToast(null), 3000); // Efface le toast après 3 secondes
     }
   };
 
+  // 🔵 Rendu
   return (
     <ModalWrapper isOpen={isOpen} isClosing={isClosing} onClose={onClose}>
+      {/* Titre */}
       <h2 className="text-xl font-bold mb-4">📩 Envoyer une notification</h2>
 
+      {/* Toast de feedback */}
       {toast && (
         <div className={`mb-4 p-2 rounded text-sm ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
           {toast.message}
@@ -58,7 +64,7 @@ export default function SendNotificationModal({ isOpen, isClosing, onClose }: Pr
       )}
 
       <div className="flex flex-col gap-4">
-        {/* Sélection utilisateur */}
+        {/* Sélection d'un utilisateur */}
         <select
           value={selectedUserCode}
           onChange={(e) => setSelectedUserCode(e.target.value)}
@@ -72,7 +78,7 @@ export default function SendNotificationModal({ isOpen, isClosing, onClose }: Pr
           ))}
         </select>
 
-        {/* Message */}
+        {/* Zone de saisie du message */}
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
@@ -81,7 +87,7 @@ export default function SendNotificationModal({ isOpen, isClosing, onClose }: Pr
           className="p-2 rounded bg-foreground text-text-primary border border-border resize-none"
         />
 
-        {/* Envoyer */}
+        {/* Bouton d'envoi */}
         <button
           onClick={handleSend}
           disabled={loading}

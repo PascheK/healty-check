@@ -2,16 +2,20 @@
 
 import { openDB, IDBPDatabase } from 'idb';
 
+// 🔧 Nom de la base de données et du store
 const DB_NAME = 'healthy-check-db';
 const STORE_NAME = 'storage';
 
+// 🔵 Promesse partagée (singleton)
 let dbPromise: Promise<IDBPDatabase<any>> | null = null;
 
-async function getDB() {
+// 🔵 Fonction d'accès (ou création) à la base IndexedDB
+async function getDB(): Promise<IDBPDatabase<any>> {
   if (typeof window === 'undefined') {
     throw new Error('IndexedDB n’est pas disponible côté serveur');
   }
 
+  // Si aucune promesse n’existe encore
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, undefined, {
       upgrade(db) {
@@ -22,6 +26,7 @@ async function getDB() {
       },
     });
   } else {
+    // Vérifie si le store existe vraiment (par sécurité)
     const db = await dbPromise;
     if (!db.objectStoreNames.contains(STORE_NAME)) {
       db.close();
@@ -30,7 +35,7 @@ async function getDB() {
         upgrade(upgradeDb) {
           if (!upgradeDb.objectStoreNames.contains(STORE_NAME)) {
             upgradeDb.createObjectStore(STORE_NAME);
-            console.log('📦 Object store "storage" recréé après check');
+            console.log('📦 Object store "storage" recréé après vérification');
           }
         },
       });
@@ -40,17 +45,24 @@ async function getDB() {
   return dbPromise;
 }
 
+// 🔧 Service de stockage générique
 export const storageService = {
-  async setItem(key: string, value: any) {
+  // ✅ Écriture d’une valeur
+  async setItem(key: string, value: any): Promise<void> {
     try {
       const db = await getDB();
       await db.put(STORE_NAME, value, key);
     } catch (error) {
       console.warn('⚠️ IndexedDB indisponible, fallback localStorage', error);
-      localStorage.setItem(key, JSON.stringify(value));
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (e) {
+        console.error('❌ localStorage également indisponible :', e);
+      }
     }
   },
 
+  // ✅ Lecture d’une valeur
   async getItem<T = any>(key: string): Promise<T | null> {
     try {
       const db = await getDB();
@@ -58,18 +70,28 @@ export const storageService = {
       return result ?? null;
     } catch (error) {
       console.warn('⚠️ IndexedDB indisponible, fallback localStorage', error);
-      const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : null;
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
+      } catch (e) {
+        console.error('❌ Erreur lecture localStorage :', e);
+        return null;
+      }
     }
   },
 
-  async removeItem(key: string) {
+  // ✅ Suppression d’une valeur
+  async removeItem(key: string): Promise<void> {
     try {
       const db = await getDB();
       await db.delete(STORE_NAME, key);
     } catch (error) {
       console.warn('⚠️ IndexedDB indisponible, fallback localStorage', error);
-      localStorage.removeItem(key);
+      try {
+        localStorage.removeItem(key);
+      } catch (e) {
+        console.error('❌ Échec suppression localStorage :', e);
+      }
     }
   },
 };
